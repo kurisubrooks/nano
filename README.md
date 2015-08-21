@@ -1,8 +1,12 @@
 # Nano
 Totally not a robot.
 
-##### Run
-Nano requires Nodejs
+#### Installation
+Nano requires Nodejs  
+1. `cd ./nano`
+2. `git clone git@github.com:kurisubrooks/nano.git`
+1. `npm install`
 
-1. `npm i`
+#### Run
+1. `cd ./nano`
 2. `npm start`
