@@ -1,12 +1,15 @@
 # Nano
-Totally not a robot.
+I may have a sweet roll in my arm, but i'm totally not a robot.
 
-#### Installation
-Nano requires Nodejs  
-1. `cd ./nano`
-2. `git clone git@github.com:kurisubrooks/nano.git`
-1. `npm install`
+### Installation
+##### Prerequisites
+- [NodeJS v0.10.2 +](https://nodejs.org/download/)
 
-#### Run
-1. `cd ./nano`
+##### Installation
+1. `cd ~/.../eew`
+2. `git clone git@github.com:lumios/eew.git`
+3. `sudo npm install`
+
+##### Run
+1. `cd ~/.../eew`
 2. `npm start`
