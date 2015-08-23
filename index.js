@@ -4,6 +4,7 @@ var http = require("https");
 var YQL = require('yql');
 
 var trans = require("./lib/eew/epicenter.json");
+var twitID = "214358709";
 var client = new twitter({
     consumer_key: '',
     consumer_secret: '',
@@ -27,12 +28,11 @@ slack.on('open', function() {
     });
 });
 
-var userID = 214358709;
-client.stream('statuses/filter', {follow: userID}, function(stream) {
+client.stream('statuses/filter', {follow: twitID}, function(stream) {
     stream.on('data', function(tweet) {
         if (tweet.delete != undefined) {return;}
 
-        if (tweet.user.id_str == userID) {
+        if (tweet.user.id_str == twitID) {
             newQuake(tweet.text);
             console.log(tweet.text);
         }
@@ -125,13 +125,34 @@ slack.on('message', function(message) {
     var user = slack.getUserByID(message.user);
     var type = message.type;
     var text = message.text;
-
     if (text == null) return;
+
+    function random() {
+        var ok = [
+            'はい',
+            '分かりました',
+            'それを得ました',
+            '了解しました',
+            'ニャ〜',
+            'ロジャー'
+        ];
+
+        var wait = [
+            'ちょっと待って...',
+            '待ってください!',
+            'あの..',
+            'ええと...'
+        ]
+
+        function calc(input) {return input[Math.floor(Math.random() * input.length)];}
+        return calc(ok) + "、 _" + calc(wait) + "_ ";
+    }
 
     /*
     // Weather
     */
     if (type == 'message' && text.indexOf('.weather') >= 0) {
+        channel.send(random());
         var weatherIN = message.text;
         var weatherOUT = weatherIN.replace(".weather ", "");
 
@@ -142,7 +163,7 @@ slack.on('message', function(message) {
             if (data.query.results == null) {
                 channel.send("Error: _Place not found._");
             } else if (data.query.results != null) {
-                var querydata = data.query.results.channel;
+                var weather = data.query.results.channel;
                 var location = data.query.results.channel.location;
                 var condition = data.query.results.channel.item.condition;
                 var forecast = data.query.results.channel.item.forecast;
@@ -219,26 +240,26 @@ slack.on('message', function(message) {
                     'title': emojiType(condition.text) + ' ' + location.city + ', ' + location.country,
                     'mrkdwn_in': ['text'],
                     'text':
-                        "*Temperature*: " + condition.temp + "º" + querydata.units.temperature + "\n" +
+                        "*Temperature*: " + condition.temp + "º" + weather.units.temperature + "\n" +
                         "*Condition*: " + condition.text + "\n" +
-                        "*Humidity*: " + querydata.atmosphere.humidity + "%\n" +
-                        "*Wind Speed*: " + querydata.wind.speed + querydata.units.speed + "\n" +
-                        "*Pressure*: " + querydata.atmosphere.pressure + querydata.units.pressure + "\n\n" +
+                        "*Humidity*: " + weather.atmosphere.humidity + "%\n" +
+                        "*Wind Speed*: " + weather.wind.speed + weather.units.speed + "\n" +
+                        "*Pressure*: " + weather.atmosphere.pressure + weather.units.pressure + "\n\n" +
                         "*Weekly Forecast*: \n" +
                             emojiType(forecast[0].text) + " *" + forecast[0].day + "*, " + forecast[0].date + "\n" +
-                            forecast[0].text + ", Min: " + forecast[0].low + "º" + querydata.units.temperature + ", Max: " + forecast[0].high + "º" + querydata.units.temperature + "\n\n" +
+                            forecast[0].text + ", Min: " + forecast[0].low + "º" + weather.units.temperature + ", Max: " + forecast[0].high + "º" + weather.units.temperature + "\n\n" +
 
                             emojiType(forecast[1].text) + " *" + forecast[1].day + "*, " + forecast[1].date + "\n" +
-                            forecast[1].text + ", Min: " + forecast[1].low + "º" + querydata.units.temperature + ", Max: " + forecast[1].high + "º" + querydata.units.temperature + "\n\n" +
+                            forecast[1].text + ", Min: " + forecast[1].low + "º" + weather.units.temperature + ", Max: " + forecast[1].high + "º" + weather.units.temperature + "\n\n" +
 
                             emojiType(forecast[2].text) + " *" + forecast[2].day + "*, " + forecast[2].date + "\n" +
-                            forecast[2].text + ", Min: " + forecast[2].low + "º" + querydata.units.temperature + ", Max: " + forecast[2].high + "º" + querydata.units.temperature + "\n\n" +
+                            forecast[2].text + ", Min: " + forecast[2].low + "º" + weather.units.temperature + ", Max: " + forecast[2].high + "º" + weather.units.temperature + "\n\n" +
 
                             emojiType(forecast[3].text) + " *" + forecast[3].day + "*, " + forecast[3].date + "\n" +
-                            forecast[3].text + ", Min: " + forecast[3].low + "º" + querydata.units.temperature + ", Max: " + forecast[3].high + "º" + querydata.units.temperature + "\n\n" +
+                            forecast[3].text + ", Min: " + forecast[3].low + "º" + weather.units.temperature + ", Max: " + forecast[3].high + "º" + weather.units.temperature + "\n\n" +
 
                             emojiType(forecast[4].text) + " *" + forecast[4].day + "*, " + forecast[4].date + "\n" +
-                            forecast[4].text + ", Min: " + forecast[4].low + "º" + querydata.units.temperature + ", Max: " + forecast[4].high + "º" + querydata.units.temperature
+                            forecast[4].text + ", Min: " + forecast[4].low + "º" + weather.units.temperature + ", Max: " + forecast[4].high + "º" + weather.units.temperature
                 }];
 
                 slack._apiCall('chat.postMessage', {
@@ -333,7 +354,7 @@ slack.on('message', function(message) {
             var searchText = searchMessage.substring(8, searchMessage.length).replace(/\s+/g, "+");
             var url = "https://www.googleapis.com/customsearch/v1?key=AIzaSyAruE7wV7LaL1tZ1XJRHCtA7pmuz9EfXl8&cx=006735756282586657842:s7i_4ej9amu&q=" + searchText;
 
-            channel.send("はい、分かりました！ ちょっとまって...")
+            channel.send(random());
 
             http.get(url, function(res) {
             	if (res.statusCode == 200) {
@@ -345,19 +366,55 @@ slack.on('message', function(message) {
 
             		res.on("end", function() {
             			var result = JSON.parse(data);
-                        var search1 = "<@" + user.name + ">";
-                        var search2 = result["items"][0]["link"];
-                        var search3 = result["items"][0]["snippet"];
 
-            			if (result["items"] != null) {
+                        if (result["searchInformation"]["totalResults"] != "0") {
+                            var search1 = "<@" + user.name + ">";
+                            var search2 = result["items"][0]["link"];
+                            var search3 = result["items"][0]["snippet"];
+
+                            var searchAttachments = [{
+                                "fallback": "Here are the results of your search:",
+                                "color": "#2F84E0",
+                                "title": result["items"][0]["title"],
+                                "title_link": result["items"][0]["link"],
+                                "text": result["items"][0]["snippet"] + "\n" + result["items"][0]["link"],
+                                "thumb_url": result["items"][0]["pagemap"]["cse_thumbnail"][0]["src"]
+                            }]
+
+                            /*
+                            "items": [
+                              {
+                               "kind": "customsearch#result",
+                               "title": "JavaScript random() Method",
+                               "htmlTitle": "\u003cb\u003eJavaScript random\u003c/b\u003e() Method",
+                               "link": "http://www.w3schools.com/jsref/jsref_random.asp",
+                               "displayLink": "www.w3schools.com",
+                               "snippet": "Return a random number between 0 (inclusive) and 1 (exclusive): ... The random(\n) method returns a random number from 0 (inclusive) up to but not including 1 ...",
+                               "htmlSnippet": "Return a \u003cb\u003erandom\u003c/b\u003e number between 0 (inclusive) and 1 (exclusive): ... The \u003cb\u003erandom\u003c/b\u003e(\u003cbr\u003e\n) method returns a \u003cb\u003erandom\u003c/b\u003e number from 0 (inclusive) up to but not including 1&nbsp;...",
+                               "cacheId": "UgaFEzzeF_MJ",
+                               "formattedUrl": "www.w3schools.com/jsref/jsref_random.asp",
+                               "htmlFormattedUrl": "www.w3schools.com/jsref/jsref_\u003cb\u003erandom\u003c/b\u003e.asp",
+                               "pagemap": {
+                                "metatags": [
+                                 {
+                                  "viewport": "width=device-width, initial-scale=1"
+                                 }
+                                ]
+                               }
+                              },
+                            */
+
                             slack._apiCall('chat.postMessage', {
                                 as_user: true,
                                 unfurl_links: "false",
                                 unfurl_media: "false",
                                 channel: "#" + channel.name,
-                                text: search1 + ": " + search2 + "\n" + search3
+                                attachments: JSON.stringify(searchAttachments)
+                                //text: search1 + ": " + search2 + "\n" + search3
                             });
-            			}
+                        } else {
+                            channel.send("Error: _Couldn't find any results for:_ '" + searchText + "'");
+                        }
             		});
             	}
             });
@@ -369,7 +426,7 @@ slack.on('message', function(message) {
         if (text.indexOf('.nya')>=0){
             var catAttach = [{
                 'fallback': 'Aw, look at this adorable doofus',
-                'text': '(=^･ω･^=)',
+                'pretext': '(=^･ω･^=)',
                 'image_url': 'http://thecatapi.com/api/images/get?format=src&type=gif'
             }];
 
@@ -383,6 +440,10 @@ slack.on('message', function(message) {
         /*
         // Basic Commands
         */
+        if (text == '.test') {
+            channel.send(random());
+        }
+
         if (text == 'eeheehee') {
             channel.send("おっ、せーせんぱい？ ( ͡° ͜ʖ ͡°)");}
         if (text.indexOf('.shrug') >= 0)
