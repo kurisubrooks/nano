@@ -12,11 +12,12 @@ var client = new twitter({
     access_token_secret: ''
 });
 
-var token = '';
+var googleToken = '';
+var slackToken = '';
 var autoReconnect = true;
 var autoMark = true;
 
-var slack = new Slack(token, autoReconnect, autoMark);
+var slack = new Slack(slackToken, autoReconnect, autoMark);
 
 slack.on('open', function() {
     console.log("> Connected to Slack");
@@ -294,10 +295,11 @@ slack.on('message', function(message) {
         /*
         // Help command
         */
-        if (text == '.commands' || text == '.help' || text == '.halp') {
-            channel.send("`.search $` — Search Google");
-            channel.send("`.weather $` — Retrieve Weather of Specified Place");
-            channel.send("`.shrug`, `.kawaii`, `.close`, `.nya`, `.flip`, `.lenny`, `.cries`, `.meep`, `.nbc`, `.facepalm`, `.no`, `.why`")
+        if (user != (slack.getUserByID("U09218631")) && text == '.commands' || text == '.help' || text == '.halp') {
+            channel.send(
+                "`.search %query` - Search Google with %query" + "\n" +
+                "`.weather %place` - Get the Weather for %place" + "\n" +
+                "`.shrug`, `.kawaii`, `.close`, `.nya`, `.flip`, `.lenny`, `.cries`, `.meep`, `.nbc`, `.facepalm`, `.no`, `.why`")
         }
 
         /*
@@ -352,7 +354,7 @@ slack.on('message', function(message) {
         if (text.indexOf(".search") >= 0) {
             var searchMessage = message.text;
             var searchText = searchMessage.substring(8, searchMessage.length).replace(/\s+/g, "+");
-            var url = "https://www.googleapis.com/customsearch/v1?key=AIzaSyAruE7wV7LaL1tZ1XJRHCtA7pmuz9EfXl8&cx=006735756282586657842:s7i_4ej9amu&q=" + searchText;
+            var url = "https://www.googleapis.com/customsearch/v1?key=" + googleToken + "&cx=006735756282586657842:s7i_4ej9amu&q=" + searchText;
 
             channel.send(random());
 
@@ -372,37 +374,20 @@ slack.on('message', function(message) {
                             var search2 = result["items"][0]["link"];
                             var search3 = result["items"][0]["snippet"];
 
+                            if (typeof result["items"][0]["pagemap"]["cse_thumbnail"][0]["src"] === 'undefined') {
+                                var thumbURL = null;
+                            } else {
+                                var thumbURL = result["items"][0]["pagemap"]["cse_thumbnail"][0]["src"];
+                            }
+
                             var searchAttachments = [{
                                 "fallback": "Here are the results of your search:",
                                 "color": "#2F84E0",
                                 "title": result["items"][0]["title"],
                                 "title_link": result["items"][0]["link"],
                                 "text": result["items"][0]["snippet"] + "\n" + result["items"][0]["link"],
-                                "thumb_url": result["items"][0]["pagemap"]["cse_thumbnail"][0]["src"]
+                                "thumb_url": thumbURL
                             }]
-
-                            /*
-                            "items": [
-                              {
-                               "kind": "customsearch#result",
-                               "title": "JavaScript random() Method",
-                               "htmlTitle": "\u003cb\u003eJavaScript random\u003c/b\u003e() Method",
-                               "link": "http://www.w3schools.com/jsref/jsref_random.asp",
-                               "displayLink": "www.w3schools.com",
-                               "snippet": "Return a random number between 0 (inclusive) and 1 (exclusive): ... The random(\n) method returns a random number from 0 (inclusive) up to but not including 1 ...",
-                               "htmlSnippet": "Return a \u003cb\u003erandom\u003c/b\u003e number between 0 (inclusive) and 1 (exclusive): ... The \u003cb\u003erandom\u003c/b\u003e(\u003cbr\u003e\n) method returns a \u003cb\u003erandom\u003c/b\u003e number from 0 (inclusive) up to but not including 1&nbsp;...",
-                               "cacheId": "UgaFEzzeF_MJ",
-                               "formattedUrl": "www.w3schools.com/jsref/jsref_random.asp",
-                               "htmlFormattedUrl": "www.w3schools.com/jsref/jsref_\u003cb\u003erandom\u003c/b\u003e.asp",
-                               "pagemap": {
-                                "metatags": [
-                                 {
-                                  "viewport": "width=device-width, initial-scale=1"
-                                 }
-                                ]
-                               }
-                              },
-                            */
 
                             slack._apiCall('chat.postMessage', {
                                 as_user: true,
@@ -410,7 +395,6 @@ slack.on('message', function(message) {
                                 unfurl_media: "false",
                                 channel: "#" + channel.name,
                                 attachments: JSON.stringify(searchAttachments)
-                                //text: search1 + ": " + search2 + "\n" + search3
                             });
                         } else {
                             channel.send("Error: _Couldn't find any results for:_ '" + searchText + "'");
