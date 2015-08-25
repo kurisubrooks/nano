@@ -33,8 +33,7 @@ slack.on('open', function() {
 
 client.stream('statuses/filter', {follow: twitID}, function(stream) {
     stream.on('data', function(tweet) {
-        if (tweet.delete != undefined) {return;}
-
+        if (tweet.delete != undefined) return;
         if (tweet.user.id_str == twitID) {
             newQuake(tweet.text);
             console.log(tweet.text);
@@ -317,7 +316,7 @@ slack.on('message', function(message) {
             if (text.indexOf("tadaima") >= 0) channel.send("おかえり、先輩 :sparkling_heart:");
             if (text.indexOf("leaving") >= 0) channel.send("え？ 先輩、どこですか？ どこに行くの？ 先輩！？ :sob:");
             if (text.indexOf("crashing") >= 0) channel.send("え？ 大丈夫、先輩？ 大丈夫か！？");
-            if (text.indexOf("crashed") >= 0) channel.send("ああいや、ない再び.. 私は薬を取得します..");
+            if (text.indexOf("crashed") >= 0) channel.send("ああいや、ない再び！ 私は薬を取得しますよ..");
         }
 
         /*
