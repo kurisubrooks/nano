@@ -3,17 +3,19 @@ var Slack = require('slack-client');
 var http = require("https");
 var YQL = require('yql');
 
+var keys = require("./keys.js");
 var trans = require("./lib/eew/epicenter.json");
+
 var twitID = "214358709";
 var client = new twitter({
-    consumer_key: '',
-    consumer_secret: '',
-    access_token_key: '',
-    access_token_secret: ''
+    consumer_key: keys.twit_conkey,
+    consumer_secret: keys.twit_consec,
+    access_token_key: keys.twit_acckey,
+    access_token_secret: keys.twit_accsec
 });
 
-var googleToken = '';
-var slackToken = '';
+var googleToken = keys.googl_token;
+var slackToken = keys.slack_token;
 var autoReconnect = true;
 var autoMark = true;
 
@@ -140,24 +142,24 @@ slack.on('message', function(message) {
 
         var wait = [
             'ちょっと待って...',
-            '待ってください!',
+            '待ってください！',
             'あの..',
             'ええと...'
         ]
 
         function calc(input) {return input[Math.floor(Math.random() * input.length)];}
-        return calc(ok) + "、 _" + calc(wait) + "_ ";
+        return calc(ok) + "、 _" + calc(wait) + "_";
     }
 
     /*
     // Weather
     */
-    if (type == 'message' && text.indexOf('.weather') >= 0) {
+    if (type == 'message' && text.startsWith('.weather')) {
         channel.send(random());
         var weatherIN = message.text;
         var weatherOUT = weatherIN.replace(".weather ", "");
 
-        var query = new YQL('select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="' + weatherOUT + '") and u="c"');
+        var query = new YQL('select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="' + encodeURIComponent(weatherOUT) + '") and u="c"');
 
         query.exec(function(err, data) {
             if (err) throw err;
@@ -309,24 +311,27 @@ slack.on('message', function(message) {
             channel.send("何？");}
 
         /*
-        // Welcomes back Rioka
+        // Rioka Greetings
         */
-        if (user == slack.getUserByID("U08C6H4JV") && text.indexOf("tadaima") >= 0) {
-            channel.send("おかえり、先輩 :sparkling_heart:");
+        if (user == slack.getUserByID("U08C6H4JV")) {
+            if (text.indexOf("tadaima") >= 0) channel.send("おかえり、先輩 :sparkling_heart:");
+            if (text.indexOf("leaving") >= 0) channel.send("え？ 先輩、どこですか？ どこに行くの？ 先輩！？ :sob:");
+            if (text.indexOf("crashing") >= 0) channel.send("え？ 大丈夫、先輩？ 大丈夫か！？");
+            if (text.indexOf("crashed") >= 0) channel.send("ああいや、ない再び.. 私は薬を取得します..");
         }
 
         /*
-        // Says Bye to Kaori
+        // Kaori Greetings
         */
-        if (user == slack.getUserByID("U07RM885B") && text.indexOf("leaving") >= 0) {
-            channel.send("え、かおりさま？ 行かないで！あっ.. 愛してる！");
+        if (user == slack.getUserByID("U07RM885B")) {
+            if (text.indexOf("leaving") >= 0) channel.send("え、かおりさま？ 行かないで！あっ.. 愛してる！");
+            if (text.indexOf("tadaima") >= 0) channel.send("先輩、あなたが死んでから戻って！〜 :sparkling_heart:");
         }
 
         /*
         // Close Nano
         */
-        if (user === (slack.getUserByID("U07RLJWDC")) &&
-        text == ".exit" || text == ".gtfo" || text == ".leave") {
+        if (user === (slack.getUserByID("U07RLJWDC")) && text == ".exit" || text == ".gtfo" || text == ".leave") {
             channel.send("あなたは私が行ってしたいですか？\nそうですか、あの... 私はあなたを失敗して申し訳ありません。\n私は今去ることになります。 さようなら :disappointed:");
             console.log("> Closed due to request from " + slack.getUserByID(message.user));
             process.exit(0);
@@ -351,10 +356,10 @@ slack.on('message', function(message) {
         /*
         // Google / Search
         */
-        if (text.indexOf(".search") >= 0) {
+        if (text.startsWith(".search")) {
             var searchMessage = message.text;
             var searchText = searchMessage.substring(8, searchMessage.length).replace(/\s+/g, "+");
-            var url = "https://www.googleapis.com/customsearch/v1?key=" + googleToken + "&cx=006735756282586657842:s7i_4ej9amu&q=" + searchText;
+            var url = "https://www.googleapis.com/customsearch/v1?key=" + googleToken + "&num=1&cx=006735756282586657842:s7i_4ej9amu&q=" + encodeURIComponent(searchText);
 
             channel.send(random());
 
@@ -368,6 +373,7 @@ slack.on('message', function(message) {
 
             		res.on("end", function() {
             			var result = JSON.parse(data);
+                        //channel.send(JSON.stringify(result));
 
                         if (result["searchInformation"]["totalResults"] != "0") {
                             var search1 = "<@" + user.name + ">";
@@ -385,7 +391,7 @@ slack.on('message', function(message) {
                                 "color": "#2F84E0",
                                 "title": result["items"][0]["title"],
                                 "title_link": result["items"][0]["link"],
-                                "text": result["items"][0]["snippet"] + "\n" + result["items"][0]["link"],
+                                "text": result["items"][0]["snippet"] + "\n" + "<" + decodeURIComponent(result["items"][0]["link"]) + ">",
                                 "thumb_url": thumbURL
                             }]
 
@@ -401,6 +407,15 @@ slack.on('message', function(message) {
                         }
             		});
             	}
+
+                else if (res.statusCode != 200) {
+                    if (res.statusCode == 400) channel.send("Error: _Bad Request_ " + res.statusCode)
+                    else if (res.statusCode == 403) channel.send("Error: _Daily Limit Exceeded_ " + res.statusCode)
+                    else if (res.statusCode == 500) channel.send("Error: _Internal Server Error_ " + res.statusCode)
+                    else channel.send("Error: " + res.statusCode)
+                }
+            }).on('error', function(e) {
+                console.error(e);
             });
         }
 
