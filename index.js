@@ -374,10 +374,10 @@ slack.on('message', function(message) {
                             var search2 = result["items"][0]["link"];
                             var search3 = result["items"][0]["snippet"];
 
-                            if (typeof result["items"][0]["pagemap"]["cse_thumbnail"][0]["src"] === 'undefined') {
-                                var thumbURL = null;
-                            } else {
+                            if ("pagemap" in result["items"][0] && "cse_thumbnail" in result["items"][0]["pagemap"]) {
                                 var thumbURL = result["items"][0]["pagemap"]["cse_thumbnail"][0]["src"];
+                            } else {
+                                var thumbURL = "";
                             }
 
                             var searchAttachments = [{
