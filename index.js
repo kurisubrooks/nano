@@ -64,6 +64,9 @@ function newQuake(inputData) {
         }
     }
 
+    var quakeIndex = 1;
+    var quakeArray = new Array();
+
     if (situation == 9){var situationString = "Final";}
     else {var situationString = "#" + (Number(revision) - 1);}
 
@@ -98,28 +101,46 @@ function newQuake(inputData) {
             'text': "Epicenter: " + epicenterEN + "\nMagnitude: " + magnitude + ", Seismic: " + seismicLocale + ", Depth: " + depth + "km",
             'title': ":quake: An Earthquake has Occurred."
         }];
+    }
 
-        slack._apiCall('chat.postMessage', {
-            'as_user': true,
-            'channel': '#general',
-            'attachments': JSON.stringify(messageAttachments)
-        });
+    else if (situation == 9) {
+        var messageAttachments = [{
+            'color': trainingString,
+            'fallback': 'Earthquake - ' + epicenterEN + ", Seismic "  + seismicLocale,
+            'text': "Epicenter: " + epicenterEN + "\nMagnitude: " + magnitude + ", Seismic: " + seismicLocale + ", Depth: " + depth + "km",
+            'title': "Update " + situationString,
+            "image_url": "http://images.zish.in/" + earthquake_id.replace("ND", "") + ".png"
+        }];
     }
 
     else {
         var messageAttachments = [{
             'color': trainingString,
             'fallback': 'Earthquake - ' + epicenterEN + ", Seismic "  + seismicLocale,
-            'text': "Magnitude: " + magnitude + ", Seismic: " + seismicLocale + ", Depth: " + depth + "km",
-            'title': "Update " + situationString + ":"
+            'text': "Epicenter: " + epicenterEN + "\nMagnitude: " + magnitude + ", Seismic: " + seismicLocale + ", Depth: " + depth + "km",
+            'title': "Update " + situationString
         }];
-
-        slack._apiCall('chat.postMessage', {
-            'as_user': true,
-            'channel': '#general',
-            'attachments': JSON.stringify(messageAttachments)
-        });
     }
+
+    /*
+    if (revision == quakeIndex || situation == '9') {
+        // push quake
+        quakeIndex++
+    }
+
+    for (i = 0; i < quakeArray.length; i++) {
+        if (quakeArray[i].revision == quakeIndex) {
+            // push quake
+            break;
+        }
+    }
+    */
+
+    slack._apiCall('chat.postMessage', {
+        'as_user': true,
+        'channel': '#general',
+        'attachments': JSON.stringify(messageAttachments)
+    });
 }
 
 slack.on('message', function(message) {
@@ -278,19 +299,23 @@ slack.on('message', function(message) {
         // Trigger New Quake
         */
         if (user === (slack.getUserByID("U07RLJWDC")) && text == '.newquake') {
-            newQuake("37,01,2015/08/22 22:20:58,0,1,ND20150822222045,2015/08/22 22:20:40,30.8,131.2,種子島近海,10,4.0,3,1,0");
+                newQuake("36,01,2015/08/26 07:51:47,0,1,ND20150826075144,2015/08/26 07:51:25,31.8,132.5,九州地方南東沖,10,5.5,3,1,0");
 
             setTimeout(function(){
-                newQuake("37,01,2015/08/22 22:20:58,0,2,ND20150822222045,2015/08/22 22:20:40,30.8,131.2,種子島近海,10,3.9,3,1,0");
+                newQuake("37,01,2015/08/26 07:51:48,0,2,ND20150826075144,2015/08/26 07:51:34,32.0,132.0,日向灘,10,5.3,3,1,0");
+            }, 1000);
+
+            setTimeout(function(){
+                newQuake("37,01,2015/08/26 07:51:49,0,3,ND20150826075144,2015/08/26 07:51:37,32.2,131.8,日向灘,30,5.0,3,1,0");
             }, 2000);
 
             setTimeout(function(){
-                newQuake("37,01,2015/08/22 22:20:58,0,3,ND20150822222045,2015/08/22 22:20:40,30.8,131.2,種子島近海,10,3.7,2,1,0");
-            }, 5000);
+                newQuake("37,01,2015/08/26 07:51:58,0,4,ND20150826075144,2015/08/26 07:51:36,32.1,131.8,日向灘,30,5.1,3,1,0");
+            }, 3000);
 
             setTimeout(function(){
-                newQuake("37,01,2015/08/22 22:20:58,9,4,ND20150822222045,2015/08/22 22:20:40,30.8,131.2,種子島近海,10,3.5,3,1,0");
-            }, 10000);
+                newQuake("37,01,2015/08/26 07:52:32,9,5,ND20150826075144,2015/08/26 07:51:36,32.1,131.9,日向灘,30,5.4,4,1,0");
+            }, 4000);
         }
 
         /*
