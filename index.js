@@ -33,10 +33,10 @@ slack.on('open', function() {
 
 client.stream('statuses/filter', {follow: twitID}, function(stream) {
     stream.on('data', function(tweet) {
-        if (tweet.delete != undefined) return;
+        if (tweet.delete != 'undefined') return;
         if (tweet.user.id_str == twitID) {
+        console.log(tweet.text);
             newQuake(tweet.text);
-            console.log(tweet.text);
         }
     });
 
@@ -56,19 +56,21 @@ function newQuake(inputData) {
         global[item] = parsedInput[i];
     }
 
+    var translationNotFound = true;
     for (var i = 0; i < trans.length; i++) {
-        var item =  trans[i];
+        var item = trans[i];
+
         if (item.jp == epicenter) {
-            epicenterJP = item.jp;
-            epicenterEN = item.en;
-        } else {
-            epicenterJP = epicenter + " [ERRNO_TRANSL]";
-            epicenterEN = epicenter + " [ERRNO_TRANSL]";
+            translationNotFound = false;
+            var epicenterJP = item.jp;
+            var epicenterEN = item.en;
         }
     }
 
-    var quakeIndex = 1;
-    var quakeArray = new Array();
+    if (translationNotFound) {
+        var epicenterJP = epicenter;
+        var epicenterEN = epicenter;
+    }
 
     if (situation == 9){var situationString = "Final";}
     else {var situationString = "#" + (Number(revision) - 1);}
@@ -126,6 +128,9 @@ function newQuake(inputData) {
     }
 
     /*
+    var quakeIndex = 1;
+    var quakeArray = new Array();
+
     if (revision == quakeIndex || situation == '9') {
         // push quake
         quakeIndex++
@@ -297,13 +302,87 @@ slack.on('message', function(message) {
         });
     }
 
+    /*
+    // Google / Search
+    */
+    if (text.startsWith(".search")) {
+        var searchMessage = message.text;
+        var searchText = searchMessage.substring(8, searchMessage.length).replace(/\s+/g, "+");
+        var url = "https://www.googleapis.com/customsearch/v1?key=" + googleToken + "&num=1&cx=006735756282586657842:s7i_4ej9amu&q=" + encodeURIComponent(searchText);
+
+        channel.send(random());
+
+        http.get(url, function(res) {
+            if (res.statusCode == 200) {
+                var data = '';
+
+                res.on("data", function(chunk) {
+                    data += chunk;
+                });
+
+                res.on("end", function() {
+                    var result = JSON.parse(data);
+                    //channel.send(JSON.stringify(result));
+
+                    if (result["searchInformation"]["totalResults"] != "0") {
+                        var search1 = "<@" + user.name + ">";
+                        var search2 = result["items"][0]["link"];
+                        var search3 = result["items"][0]["snippet"];
+
+                        if ("pagemap" in result["items"][0] && "cse_thumbnail" in result["items"][0]["pagemap"]) {
+                            var thumbURL = result["items"][0]["pagemap"]["cse_thumbnail"][0]["src"];
+                        } else {
+                            var thumbURL = "";
+                        }
+
+                        var searchAttachments = [{
+                            "fallback": "Here are the results of your search:",
+                            "color": "#2F84E0",
+                            "title": result["items"][0]["title"],
+                            "title_link": result["items"][0]["link"],
+                            "text": result["items"][0]["snippet"] + "\n" + "<" + decodeURIComponent(result["items"][0]["link"]) + ">",
+                            "thumb_url": thumbURL
+                        }]
+
+                        slack._apiCall('chat.postMessage', {
+                            as_user: true,
+                            unfurl_links: "false",
+                            unfurl_media: "false",
+                            channel: "#" + channel.name,
+                            attachments: JSON.stringify(searchAttachments)
+                        });
+                    } else {
+                        channel.send("Error: _Couldn't find any results for:_ '" + searchText + "'");
+                    }
+                });
+            }
+
+            else if (res.statusCode != 200) {
+                if (res.statusCode == 400) channel.send("Error: _Bad Request_ " + res.statusCode)
+                else if (res.statusCode == 403) channel.send("Error: _Daily Limit Exceeded_ " + res.statusCode)
+                else if (res.statusCode == 500) channel.send("Error: _Internal Server Error_ " + res.statusCode)
+                else channel.send("Error: " + res.statusCode)
+            }
+        }).on('error', function(e) {
+            console.error(e);
+        });
+    }
+
+    /*
+    // Manually Push Quake
+    */
+    if (type == 'message' && text.startsWith(".quake")) {
+        newQuake(text.replace(".quake ", ""));
+    }
+
     if (type == 'message') {
         /*
         // Trigger New Quake
         */
         if (user === (slack.getUserByID("U07RLJWDC")) && text == '.newquake') {
-                newQuake("37,00,2015/08/27 12:23:40,0,1,ND20150827122332,2015/08/27 12:23:12,42.7,142.1,胆振地方中東部,150,4.0,不明,0,0");
+                newQuake("37,01,2015/08/27 12:23:40,9,1,ND20150827122332,2015/08/27 12:23:12,42.7,142.1,胆振地方中東部,150,4.0,不明,0,0");
 
+            /*
             setTimeout(function(){
                 newQuake("37,00,2015/08/27 12:23:43,0,2,ND20150827122332,2015/08/27 12:23:13,42.7,142.1,胆振地方中東部,140,3.9,2,0,0");
             }, 1000);
@@ -322,7 +401,7 @@ slack.on('message', function(message) {
 
             setTimeout(function(){
                 newQuake("37,00,2015/08/27 12:24:22,9,6,ND20150827122332,2015/08/27 12:23:13,42.7,142.2,日高地方西部,140,4.3,2,0,0");
-            }, 4000);
+            }, 4000);*/
         }
 
         /*
@@ -385,72 +464,6 @@ slack.on('message', function(message) {
         }
 
         /*
-        // Google / Search
-        */
-        if (text.startsWith(".search")) {
-            var searchMessage = message.text;
-            var searchText = searchMessage.substring(8, searchMessage.length).replace(/\s+/g, "+");
-            var url = "https://www.googleapis.com/customsearch/v1?key=" + googleToken + "&num=1&cx=006735756282586657842:s7i_4ej9amu&q=" + encodeURIComponent(searchText);
-
-            channel.send(random());
-
-            http.get(url, function(res) {
-            	if (res.statusCode == 200) {
-            		var data = '';
-
-            		res.on("data", function(chunk) {
-            			data += chunk;
-            		});
-
-            		res.on("end", function() {
-            			var result = JSON.parse(data);
-                        //channel.send(JSON.stringify(result));
-
-                        if (result["searchInformation"]["totalResults"] != "0") {
-                            var search1 = "<@" + user.name + ">";
-                            var search2 = result["items"][0]["link"];
-                            var search3 = result["items"][0]["snippet"];
-
-                            if ("pagemap" in result["items"][0] && "cse_thumbnail" in result["items"][0]["pagemap"]) {
-                                var thumbURL = result["items"][0]["pagemap"]["cse_thumbnail"][0]["src"];
-                            } else {
-                                var thumbURL = "";
-                            }
-
-                            var searchAttachments = [{
-                                "fallback": "Here are the results of your search:",
-                                "color": "#2F84E0",
-                                "title": result["items"][0]["title"],
-                                "title_link": result["items"][0]["link"],
-                                "text": result["items"][0]["snippet"] + "\n" + "<" + decodeURIComponent(result["items"][0]["link"]) + ">",
-                                "thumb_url": thumbURL
-                            }]
-
-                            slack._apiCall('chat.postMessage', {
-                                as_user: true,
-                                unfurl_links: "false",
-                                unfurl_media: "false",
-                                channel: "#" + channel.name,
-                                attachments: JSON.stringify(searchAttachments)
-                            });
-                        } else {
-                            channel.send("Error: _Couldn't find any results for:_ '" + searchText + "'");
-                        }
-            		});
-            	}
-
-                else if (res.statusCode != 200) {
-                    if (res.statusCode == 400) channel.send("Error: _Bad Request_ " + res.statusCode)
-                    else if (res.statusCode == 403) channel.send("Error: _Daily Limit Exceeded_ " + res.statusCode)
-                    else if (res.statusCode == 500) channel.send("Error: _Internal Server Error_ " + res.statusCode)
-                    else channel.send("Error: " + res.statusCode)
-                }
-            }).on('error', function(e) {
-                console.error(e);
-            });
-        }
-
-        /*
         // Random Cat Image
         */
         if (text.indexOf('.nya')>=0){
@@ -474,6 +487,8 @@ slack.on('message', function(message) {
             channel.send(random());
         }
 
+        if (text.indexOf('bae') >= 0) {
+            channel.send("Did you mean; 'Nano'?")}
         if (text == 'eeheehee') {
             channel.send("おっ、せーせんぱい？ ( ͡° ͜ʖ ͡°)");}
         if (text.indexOf('.shrug') >= 0)
