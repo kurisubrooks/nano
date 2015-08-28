@@ -187,7 +187,7 @@ slack.on('message', function(message) {
         var weatherIN = message.text;
         var weatherOUT = weatherIN.replace(".weather ", "");
 
-        var query = new YQL('select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="' + encodeURIComponent(weatherOUT) + '") and u="c"');
+        var query = new YQL('select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="' + weatherOUT + '") and u="c"');
 
         query.exec(function(err, data) {
             if (err) throw err;
