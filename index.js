@@ -6,7 +6,8 @@ var YQL = require('yql');
 var keys = require("./keys.js");
 var trans = require("./lib/eew/epicenter.json");
 
-var twitID = "214358709";
+//var twitID = "3313238022"; //test
+var twitID = "214358709"; //eew
 var client = new twitter({
     consumer_key: keys.twit_conkey,
     consumer_secret: keys.twit_consec,
@@ -33,9 +34,10 @@ slack.on('open', function() {
 
 client.stream('statuses/filter', {follow: twitID}, function(stream) {
     stream.on('data', function(tweet) {
-        if (tweet.delete != 'undefined') return;
+        if (tweet.delete != undefined) return;
+
         if (tweet.user.id_str == twitID) {
-        console.log(tweet.text);
+            console.log(tweet.text);
             newQuake(tweet.text);
         }
     });
