@@ -1,7 +1,6 @@
 var Twitter = require('twitter');
 var Slack = require('slack-client');
-var http = require('https');
-var YQL = require('yql');
+var fs = require('fs');
 
 var keys = require('./keys.js');
 var trans = require('./lib/eew/epicenter.json');
@@ -21,11 +20,6 @@ var autoReconnect = true;
 var autoMark = true;
 
 var slack = new Slack(slackToken, autoReconnect, autoMark);
-if (typeof String.prototype.startsWith != 'function') {
-    String.prototype.startsWith = function (str){
-        return this.indexOf(str) === 0;
-    };
-}
 
 slack.on('open', function() {
     console.log('> Connected to Slack');
@@ -48,7 +42,7 @@ twitter.stream('statuses/filter', {follow: twitID1}, function(stream) {
     });
 
     stream.on('error', function(error) {
-    	slack._apiCall('chat.postMessage', {as_user: true,channel: '#general',text: 'Error: *Twitter* `' + error.source + '`'});
+    	slack._apiCall('chat.postMessage', {as_user: true,channel: '#general',text: '*Error:* There was a problem with "testbot": ```' + error.source + '```'});
         console.error('[!] ERROR - ' + error.source);
     });
 });
@@ -64,7 +58,7 @@ twitter.stream('statuses/filter', {follow: twitID2}, function(stream) {
     });
 
     stream.on('error', function(error) {
-    	slack._apiCall('chat.postMessage', {as_user: true, channel: '#general', text: 'Error: *Twitter* `' + error.source + '`'});
+    	slack._apiCall('chat.postMessage', {as_user: true,channel: '#general',text: '*Error:* There was a problem with "eew": ```' + error.source + '```'});
         console.error('[!] ERROR - ' + error.source);
     });
 });
@@ -165,6 +159,10 @@ slack.on('message', function(message) {
     var text = message.text;
     if (text === null) return;
 
+    String.prototype.startsWith = function(str) {
+        return this.indexOf(str) == 0;
+    };
+
     function random() {
         var ok = [
             'はい',
@@ -186,176 +184,25 @@ slack.on('message', function(message) {
         return calc(ok) + '、 _' + calc(wait) + '_';
     }
 
-    /*
-    // Weather
-    */
-    if (type == 'message' && text.startsWith('.weather')) {
-        channel.send(random());
-        var weatherIN = message.text;
-        var weatherOUT = weatherIN.replace('.weather ', '');
+    if (type == 'message' && text !== undefined) {
+        // Help Command
+        if (user != slack.getUserByID('U09218631') && text == '.help') {
+            channel.send(
+                '`.search %query` - Search Google with %query' + '\n' +
+                '`.weather %place` - Get the Weather for %place' + '\n' +
+                '`.shrug`, `.kawaii`, `.close`, `.nya`, `.flip`, `.lenny`, `.cries`, `.meep`, `.nbc`, `.facepalm`, `.no`, `.why`');
+        }
 
-        var query = new YQL('select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="' + weatherOUT + '") and u="c"');
+        // Weather
+        if (text.startsWith('.weather')) eval(fs.readFileSync('./inc/weather.js') + '');
 
-        query.exec(function(err, data) {
-            if (err) throw err;
-            if (data.query.results === null) {
-                channel.send('Error: _Place not found._');
-            } else if (data.query.results !== null) {
-                var weather = data.query.results.channel;
-                var location = data.query.results.channel.location;
-                var condition = data.query.results.channel.item.condition;
-                var forecast = data.query.results.channel.item.forecast;
+        // Google / Search
+        if (text.startsWith('.search')) eval(fs.readFileSync('./inc/search.js') + '');
 
-                function emojiType(condition) {
-                    if (condition == 'Tornado')                     return ':cyclone::dash:';
-                    else if (condition == 'Tropical Storm')         return ':cyclone::dash::sweat_drops:';
-                    else if (condition == 'Hurricane')              return ':cyclone::dash:';
-                    else if (condition == 'Mixed Rain and Snow')    return ':umbrella::snowflake:';
-                    else if (condition == 'Mixed Rain and Sleet')   return ':umbrella::snowflake:';
-                    else if (condition == 'Mixed Snow and Sleet')   return ':snowflake:';
-                    else if (condition == 'Drizzle')                return ':sweat_drops:';
-                    else if (condition == 'Blustery')               return ':leaves::dash:';
-                    else if (condition == 'Mixed Rain and Hail')    return ':umbrella::snowflake:';
-                    else if (condition == 'Snow Showers')           return ':snowflake::umbrella:';
-                    else if (condition == 'Hot')                    return ':sunny::sweat:';
-                    else if (condition == 'Cold')                   return ':snowflake::cold_sweat:';
-                    else if (condition == 'AM Showers')             return ':sunny: :umbrella:';
-                    else if (condition == 'PM Showers')             return ':crescent_moon: :umbrella:';
-                    else if (condition.indexOf('Freezing') >= 0)    return ':snowflake:';
-                    else if (condition.indexOf('Snow') >= 0)        return ':snowflake:';
-                    else if (condition.indexOf('Hail') >= 0)        return ':snowflake:';
-                    else if (condition.indexOf('Sleet') >= 0)       return ':snowflake:';
-                    else if (condition.indexOf('Dust') >= 0)        return ':dash:';
-                    else if (condition.indexOf('Fog') >= 0)         return ':dash:';
-                    else if (condition.indexOf('Haze') >= 0)        return ':dash:';
-                    else if (condition.indexOf('Smok') >= 0)        return ':fire::dash:';
-                    else if (condition.indexOf('Wind') >= 0)        return ':leaves::dash:';
-                    else if (condition.indexOf('Partly') >= 0)      return ':partly_sunny:';
-                    else if (condition.indexOf('Mostly') >= 0)      return ':partly_sunny:';
-                    else if (condition.indexOf('Cloudy') >= 0)      return ':cloud:';
-                    else if (condition.indexOf('Clear') >= 0)       return ':sunny:';
-                    else if (condition.indexOf('Sun') >= 0)         return ':sunny:';
-                    else if (condition.indexOf('Fair') >= 0)        return ':sunny:';
-                    else if (condition.indexOf('Thunder') >= 0)     return ':zap::umbrella:';
-                    else if (condition.indexOf('Showers') >= 0)     return ':umbrella:';
-                    else if (condition.indexOf('Rain') >= 0)        return ':umbrella:';
-                    else                                            return ':question:';
-                }
+        // Manually Push Quake
+        if (text.startsWith('.quake')) newQuake(text.replace('.quake ', ''));
 
-                var weatherAttach = [{
-                    'color': '#2F84E0',
-                    'fallback': 'Weather Report for ' + location.city,
-                    'title': emojiType(condition.text) + ' ' + location.city + ', ' + location.country,
-                    'mrkdwn_in': ['text'],
-                    'text':
-                        '*Temperature*: ' + condition.temp + 'º' + weather.units.temperature + '\n' +
-                        '*Condition*: ' + condition.text + '\n' +
-                        '*Humidity*: ' + weather.atmosphere.humidity + '%\n' +
-                        '*Wind Speed*: ' + weather.wind.speed + weather.units.speed + '\n' +
-                        '*Pressure*: ' + weather.atmosphere.pressure + weather.units.pressure + '\n\n' +
-                        '*Weekly Forecast*: \n' +
-                            emojiType(forecast[0].text) + ' *' + forecast[0].day + '*, ' + forecast[0].date + '\n' +
-                            forecast[0].text + ', Min: ' + forecast[0].low + 'º' + weather.units.temperature + ', Max: ' + forecast[0].high + 'º' + weather.units.temperature + '\n\n' +
-
-                            emojiType(forecast[1].text) + ' *' + forecast[1].day + '*, ' + forecast[1].date + '\n' +
-                            forecast[1].text + ', Min: ' + forecast[1].low + 'º' + weather.units.temperature + ', Max: ' + forecast[1].high + 'º' + weather.units.temperature + '\n\n' +
-
-                            emojiType(forecast[2].text) + ' *' + forecast[2].day + '*, ' + forecast[2].date + '\n' +
-                            forecast[2].text + ', Min: ' + forecast[2].low + 'º' + weather.units.temperature + ', Max: ' + forecast[2].high + 'º' + weather.units.temperature + '\n\n' +
-
-                            emojiType(forecast[3].text) + ' *' + forecast[3].day + '*, ' + forecast[3].date + '\n' +
-                            forecast[3].text + ', Min: ' + forecast[3].low + 'º' + weather.units.temperature + ', Max: ' + forecast[3].high + 'º' + weather.units.temperature + '\n\n' +
-
-                            emojiType(forecast[4].text) + ' *' + forecast[4].day + '*, ' + forecast[4].date + '\n' +
-                            forecast[4].text + ', Min: ' + forecast[4].low + 'º' + weather.units.temperature + ', Max: ' + forecast[4].high + 'º' + weather.units.temperature
-                }];
-
-                slack._apiCall('chat.postMessage', {
-                    'as_user': true,
-                    'channel': '#' + channel.name,
-                    'attachments': JSON.stringify(weatherAttach)
-                });
-            }
-        });
-    }
-
-    /*
-    // Google / Search
-    */
-    if (text.startsWith('.search')) {
-        var searchMessage = message.text;
-        var searchText = searchMessage.substring(8, searchMessage.length).replace(/\s+/g, '+');
-        var url = 'https://www.googleapis.com/customsearch/v1?key=' + googleToken + '&num=1&cx=006735756282586657842:s7i_4ej9amu&q=' + encodeURIComponent(searchText);
-
-        channel.send(random());
-
-        http.get(url, function(res) {
-            if (res.statusCode == 200) {
-                var data = '';
-
-                res.on('data', function(chunk) {
-                    data += chunk;
-                });
-
-                res.on('end', function() {
-                    var result = JSON.parse(data);
-                    //channel.send(JSON.stringify(result));
-
-                    if (result.searchInformation.totalResults != '0') {
-                        var search1 = '<@' + user.name + '>';
-                        var search2 = result.items[0].link;
-                        var search3 = result.items[0].snippet;
-
-                        if ('pagemap' in result.items[0] && 'cse_thumbnail' in result.items[0].pagemap) {
-                            var thumbURL = result.items[0].pagemap.cse_thumbnail[0].src;
-                        } else {
-                            var thumbURL = '';
-                        }
-
-                        var searchAttachments = [{
-                            'fallback': 'Here are the results of your search:',
-                            'color': '#2F84E0',
-                            'title': result.items[0].title,
-                            'title_link': result.items[0].link,
-                            'text': result.items[0].snippet + '\n' + '<' + decodeURIComponent(result.items[0].link) + '>',
-                            'thumb_url': thumbURL
-                        }];
-
-                        slack._apiCall('chat.postMessage', {
-                            as_user: true,
-                            unfurl_links: 'false',
-                            unfurl_media: 'false',
-                            channel: '#' + channel.name,
-                            attachments: JSON.stringify(searchAttachments)
-                        });
-                    } else {
-                        channel.send('Error: _Couldn\'t find any results for:_ "' + searchText + '"');
-                    }
-                });
-            }
-
-            else if (res.statusCode != 200) {
-                if (res.statusCode == 400) channel.send('Error: _Bad Request_ ' + res.statusCode);
-                else if (res.statusCode == 403) channel.send('Error: _Daily Limit Exceeded_ ' + res.statusCode);
-                else if (res.statusCode == 500) channel.send('Error: _Internal Server Error_ ' + res.statusCode);
-                else channel.send('Error: ' + res.statusCode);
-            }
-        }).on('error', function(e) {
-            console.error(e);
-        });
-    }
-
-    /*
-    // Manually Push Quake
-    */
-    if (type == 'message' && text.startsWith('.quake')) {
-        newQuake(text.replace('.quake ', ''));
-    }
-
-    if (type == 'message') {
-        /*
-        // Trigger New Quake
-        */
+        // Trigger Test Quake
         if (user === (slack.getUserByID('U07RLJWDC')) && text == '.newquake') {
                 newQuake('37,01,2011/03/11 14:46:02,0,1,ND20110311144602,2011/03/11 14:46:02,38.0,142.9,三陸沖,10,7.9,6,1,1');
 
@@ -372,25 +219,10 @@ slack.on('message', function(message) {
             }, 1200);
         }
 
-        /*
-        // Help command
-        */
-        if (user != slack.getUserByID('U09218631') && text == '.commands' || text == '.help' || text == '.halp') {
-            channel.send(
-                '`.search %query` - Search Google with %query' + '\n' +
-                '`.weather %place` - Get the Weather for %place' + '\n' +
-                '`.shrug`, `.kawaii`, `.close`, `.nya`, `.flip`, `.lenny`, `.cries`, `.meep`, `.nbc`, `.facepalm`, `.no`, `.why`');
-        }
+        // Nano Mention
+        if (text == 'nano') channel.send('何？');
 
-        /*
-        // Nano mention
-        */
-        if (text == 'nano') {
-            channel.send('何？');}
-
-        /*
         // Rioka Greetings
-        */
         if (user == slack.getUserByID('U08C6H4JV')) {
             if (text.indexOf('tadaima') >= 0) channel.send('おかえり、先輩 :sparkling_heart:');
             if (text.indexOf('leaving') >= 0) channel.send('え？ 先輩、どこですか？ どこに行くの？ 先輩！？ :sob:');
@@ -398,42 +230,32 @@ slack.on('message', function(message) {
             if (text.indexOf('crashed') >= 0) channel.send('ああいや、ない再び！ 私は薬を取得しますよ..');
         }
 
-        /*
         // Kaori Greetings
-        */
         if (user == slack.getUserByID('U07RM885B')) {
             if (text.indexOf('leaving') >= 0) channel.send('え、かおりさま？ 行かないで！あっ.. 愛してる！');
             if (text.indexOf('tadaima') >= 0) channel.send('先輩、あなたが死んでから戻って！〜 :sparkling_heart:');
         }
 
-        /*
-        // Close Nano
-        */
-        if (user === (slack.getUserByID('U07RLJWDC')) && text == '.exit' || text == '.gtfo' || text == '.leave') {
+        // Remote Crash
+        if (user == (slack.getUserByID('U07RLJWDC')) && text == '.exit') {
             channel.send('あなたは私が行ってしたいですか？\nそうですか、あの... 私はあなたを失敗して申し訳ありません。\n私は今去ることになります。 さようなら :disappointed:');
             console.log('> Closed due to request from ' + slack.getUserByID(message.user));
             process.exit(0);
         }
 
-        /*
         // Say as Nano
-        */
-        if (user == slack.getUserByID('U07RLJWDC')) {
-            if (text.startsWith('.say ') === true) {
-                var sayMsg = message.text;
-                var sayOut = sayMsg.replace('.say ', '');
+        if (user == slack.getUserByID('U07RLJWDC') && text.startsWith('.say ')) {
+            var sayMsg = message.text;
+            var sayOut = sayMsg.replace('.say ', '');
 
-                slack._apiCall('chat.postMessage', {
-                    as_user: true,
-                    channel: '#general',
-                    text: sayOut
-                });
-            }
+            slack._apiCall('chat.postMessage', {
+                as_user: true,
+                channel: '#general',
+                text: sayOut
+            });
         }
 
-        /*
         // Random Cat Image
-        */
         if (text.indexOf('.nya')>=0){
             var catAttach = [{
                 'fallback': 'Aw, look at this adorable doofus',
@@ -448,41 +270,38 @@ slack.on('message', function(message) {
             });
         }
 
-        /*
         // Basic Commands
-        */
         if (user != slack.getUserByID('U09218631')) {
-            if (text.indexOf('bae') >= 0) {
-                channel.send('Did you mean; "Nano"?');}
-            if (text == 'eeheehee') {
-                channel.send('おっ、せーせんぱい？ ( ͡° ͜ʖ ͡°)');}
-            if (text.indexOf('.shrug') >= 0)
-                {channel.send('¯\\_(ツ)_/¯');}
-            if (text.indexOf('.kawaii') >= 0)
-                {channel.send('(ﾉ◕ヮ◕)ﾉ*:・ﾟ✧');}
-            if (text.indexOf('.flip') >= 0)
-                {channel.send('(╯°□°）╯︵ ┻━┻)');}
-            if (text.indexOf('.lenny') >= 0)
-                {channel.send('( ͡° ͜ʖ ͡°)');}
-            if (text.indexOf('.cries') >= 0)
-                {channel.send('(;´∩`;)');}
-            if (text.indexOf('.nbc') >= 0)
-                {channel.send(':stars: *NBC*\n_the more you know_');}
-            if (text.indexOf('.close') >= 0)
-                {channel.send('You were so close...');}
-            if (text.indexOf('.meep') >= 0)
-                {channel.send('°ਉ°');}
-            if (text.indexOf('.facepalm') >= 0)
-                {channel.send('http://replygif.net/i/1370.gif');}
-            if (text.indexOf('.no') >= 0)
-                {channel.send('http://media0.giphy.com/media/rsBVkMZABjup2/giphy.gif');}
-            if (text.indexOf('.why') >= 0)
-                {channel.send('http://media.giphy.com/media/YA7LXKMnPHR96/giphy.gif');}
+            if (text.indexOf('bae') >= 0) channel.send('Did you mean; "Nano"?');
+            if (text == 'eeheehee') channel.send('おっ、せーせんぱい？ ( ͡° ͜ʖ ͡°)');
+            if (text.indexOf('.shrug') >= 0) channel.send('¯\\_(ツ)_/¯');
+            if (text.indexOf('.kawaii') >= 0) channel.send('(ﾉ◕ヮ◕)ﾉ*:・ﾟ✧');
+            if (text.indexOf('.flip') >= 0) channel.send('(╯°□°）╯︵ ┻━┻)');
+            if (text.indexOf('.lenny') >= 0) channel.send('( ͡° ͜ʖ ͡°)');
+            if (text.indexOf('.cries') >= 0) channel.send('(;´∩`;)');
+            if (text.indexOf('.nbc') >= 0) channel.send(':stars: *NBC*\n_the more you know_');
+            if (text.indexOf('.close') >= 0) channel.send('You were so close...');
+            if (text.indexOf('.meep') >= 0) channel.send('°ਉ°');
+            if (text.indexOf('.facepalm') >= 0) {
+                var facepalmAttach = [{'fallback': '*facepalm*','image_url': 'http://replygif.net/i/1370.gif'}]
+                    slack._apiCall('chat.postMessage', {'as_user': true,'channel': '#general','attachments': JSON.stringify(facepalmAttach)});
+            }
+
+            if (text.indexOf('.no') >= 0) {
+                var noAttach = [{'fallback': 'no.','image_url': 'http://media0.giphy.com/media/rsBVkMZABjup2/giphy.gif'}]
+                slack._apiCall('chat.postMessage', {'as_user': true,'channel': '#general','attachments': JSON.stringify(noAttach)});
+            }
+
+            if (text.indexOf('.why') >= 0) {
+                var whyAttach = [{'fallback': 'but why..?','image_url': 'http://media.giphy.com/media/YA7LXKMnPHR96/giphy.gif'}]
+                slack._apiCall('chat.postMessage', {'as_user': true,'channel': '#general','attachments': JSON.stringify(whyAttach)});
+            }
         }
     }
 });
 
 slack.on('error', function(error) {
+    channel.send('*Error:* There was an error with Slack: ```' + error + '```')
     return console.error('Error: ' + error);
 });
 
