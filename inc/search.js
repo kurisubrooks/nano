@@ -59,6 +59,6 @@ try {
     });
 }
 
-catch(err) {
-    channel.send('*Error:* There was a problem with your request: ```' + err.message + '```');
+catch(error) {
+    channel.send('*Error:* There was a problem with your request: ```' + error + '```');
 }
