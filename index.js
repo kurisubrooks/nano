@@ -186,7 +186,7 @@ slack.on('message', function(message) {
 
     if (type == 'message' && text !== undefined) {
         // Help Command
-        if (user != slack.getUserByID('U09218631') && text == '.help') {
+        if (user.name != 'nano' && text == '.help') {
             channel.send(
                 '`.search %query` - Search Google with %query' + '\n' +
                 '`.weather %place` - Get the Weather for %place' + '\n' +
@@ -203,7 +203,7 @@ slack.on('message', function(message) {
         if (text.startsWith('.quake')) newQuake(text.replace('.quake ', ''));
 
         // Trigger Test Quake
-        if (user === (slack.getUserByID('U07RLJWDC')) && text == '.newquake') {
+        if (user.name == 'kurisu' && text == '.newquake') {
                 newQuake('37,01,2011/03/11 14:46:02,0,1,ND20110311144602,2011/03/11 14:46:02,38.0,142.9,三陸沖,10,7.9,6,1,1');
 
             setTimeout(function(){
@@ -223,7 +223,7 @@ slack.on('message', function(message) {
         if (text == 'nano') channel.send('何？');
 
         // Rioka Greetings
-        if (user == slack.getUserByID('U08C6H4JV')) {
+        if (user.name == 'rioka') {
             if (text.indexOf('tadaima') >= 0) channel.send('おかえり、先輩 :sparkling_heart:');
             if (text.indexOf('leaving') >= 0) channel.send('え？ 先輩、どこですか？ どこに行くの？ 先輩！？ :sob:');
             if (text.indexOf('crashing') >= 0) channel.send('え？ 大丈夫、先輩？ 大丈夫か！？');
@@ -231,20 +231,20 @@ slack.on('message', function(message) {
         }
 
         // Kaori Greetings
-        if (user == slack.getUserByID('U07RM885B')) {
+        if (user.name == 'kaori') {
             if (text.indexOf('leaving') >= 0) channel.send('え、かおりさま？ 行かないで！あっ.. 愛してる！');
             if (text.indexOf('tadaima') >= 0) channel.send('先輩、あなたが死んでから戻って！〜 :sparkling_heart:');
         }
 
         // Remote Crash
-        if (user == (slack.getUserByID('U07RLJWDC')) && text == '.exit') {
+        if (user.name == 'kurisu' && text == '.exit') {
             channel.send('あなたは私が行ってしたいですか？\nそうですか、あの... 私はあなたを失敗して申し訳ありません。\n私は今去ることになります。 さようなら :disappointed:');
             console.log('> Closed due to request from ' + slack.getUserByID(message.user));
             process.exit(0);
         }
 
         // Say as Nano
-        if (user == slack.getUserByID('U07RLJWDC') && text.startsWith('.say ')) {
+        if (user.name == 'kurisu' && text.startsWith('.say ')) {
             var sayMsg = message.text;
             var sayOut = sayMsg.replace('.say ', '');
 
@@ -256,7 +256,7 @@ slack.on('message', function(message) {
         }
 
         // Random Cat Image
-        if (text.indexOf('.nya')>=0){
+        if (text.indexOf('.nya') >= 0){
             var catAttach = [{
                 'fallback': 'Aw, look at this adorable doofus',
                 'pretext': '(=^･ω･^=)',
@@ -271,7 +271,7 @@ slack.on('message', function(message) {
         }
 
         // Basic Commands
-        if (user != slack.getUserByID('U09218631')) {
+        if (user.name != 'nano') {
             if (text.indexOf('bae') >= 0) channel.send('Did you mean; "Nano"?');
             if (text == 'eeheehee') channel.send('おっ、せーせんぱい？ ( ͡° ͜ʖ ͡°)');
             if (text.indexOf('.shrug') >= 0) channel.send('¯\\_(ツ)_/¯');
@@ -282,6 +282,7 @@ slack.on('message', function(message) {
             if (text.indexOf('.nbc') >= 0) channel.send(':stars: *NBC*\n_the more you know_');
             if (text.indexOf('.close') >= 0) channel.send('You were so close...');
             if (text.indexOf('.meep') >= 0) channel.send('°ਉ°');
+            if (text.indexOf('.magic') >= 0) channel.send(':magic:');
             if (text.indexOf('.facepalm') >= 0) {
                 var facepalmAttach = [{'fallback': '*facepalm*','image_url': 'http://replygif.net/i/1370.gif'}]
                     slack._apiCall('chat.postMessage', {'as_user': true,'channel': '#general','attachments': JSON.stringify(facepalmAttach)});
@@ -301,7 +302,6 @@ slack.on('message', function(message) {
 });
 
 slack.on('error', function(error) {
-    channel.send('*Error:* There was an error with Slack: ```' + error + '```')
     return console.error('Error: ' + error);
 });
 
