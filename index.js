@@ -160,7 +160,7 @@ slack.on('message', function(message) {
     if (text === null) return;
 
     String.prototype.startsWith = function(str) {
-        return this.indexOf(str) == 0;
+        return this.indexOf(str) === 0;
     };
 
     function random() {
@@ -284,17 +284,17 @@ slack.on('message', function(message) {
             if (text.indexOf('.meep') >= 0) channel.send('°ਉ°');
             if (text.indexOf('.magic') >= 0) channel.send(':magic:');
             if (text.indexOf('.facepalm') >= 0) {
-                var facepalmAttach = [{'fallback': '*facepalm*','image_url': 'http://replygif.net/i/1370.gif'}]
+                var facepalmAttach = [{'fallback': '*facepalm*','image_url': 'http://replygif.net/i/1370.gif'}];
                     slack._apiCall('chat.postMessage', {'as_user': true,'channel': '#general','attachments': JSON.stringify(facepalmAttach)});
             }
 
             if (text.indexOf('.no') >= 0) {
-                var noAttach = [{'fallback': 'no.','image_url': 'http://media0.giphy.com/media/rsBVkMZABjup2/giphy.gif'}]
+                var noAttach = [{'fallback': 'no.','image_url': 'http://media0.giphy.com/media/rsBVkMZABjup2/giphy.gif'}];
                 slack._apiCall('chat.postMessage', {'as_user': true,'channel': '#general','attachments': JSON.stringify(noAttach)});
             }
 
             if (text.indexOf('.why') >= 0) {
-                var whyAttach = [{'fallback': 'but why..?','image_url': 'http://media.giphy.com/media/YA7LXKMnPHR96/giphy.gif'}]
+                var whyAttach = [{'fallback': 'but why..?','image_url': 'http://media.giphy.com/media/YA7LXKMnPHR96/giphy.gif'}];
                 slack._apiCall('chat.postMessage', {'as_user': true,'channel': '#general','attachments': JSON.stringify(whyAttach)});
             }
         }
