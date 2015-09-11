@@ -51,6 +51,12 @@ try {
                 var condition = data.query.results.channel.item.condition;
                 var forecast = data.query.results.channel.item.forecast;
 
+                var forecastText = "";
+                for (var i = 0; i < 5; i++) {
+                    forecastText += emojiType(forecast[i].text) + ' *' + forecast[i].day + '*, ' + forecast[i].date + '\n' +
+                    forecast[i].text + ', Min: ' + forecast[i].low + 'º' + weather.units.temperature + ', Max: ' + forecast[i].high + 'º' + weather.units.temperature + '\n\n'
+                }
+
                 var weatherAttach = [{
                     'color': '#2F84E0',
                     'fallback': 'Weather Report for ' + location.city,
@@ -62,21 +68,7 @@ try {
                         '*Humidity*: ' + weather.atmosphere.humidity + '%\n' +
                         '*Wind Speed*: ' + weather.wind.speed + weather.units.speed + '\n' +
                         '*Pressure*: ' + weather.atmosphere.pressure + weather.units.pressure + '\n\n' +
-                        '*Weekly Forecast*: \n' +
-                            emojiType(forecast[0].text) + ' *' + forecast[0].day + '*, ' + forecast[0].date + '\n' +
-                            forecast[0].text + ', Min: ' + forecast[0].low + 'º' + weather.units.temperature + ', Max: ' + forecast[0].high + 'º' + weather.units.temperature + '\n\n' +
-
-                            emojiType(forecast[1].text) + ' *' + forecast[1].day + '*, ' + forecast[1].date + '\n' +
-                            forecast[1].text + ', Min: ' + forecast[1].low + 'º' + weather.units.temperature + ', Max: ' + forecast[1].high + 'º' + weather.units.temperature + '\n\n' +
-
-                            emojiType(forecast[2].text) + ' *' + forecast[2].day + '*, ' + forecast[2].date + '\n' +
-                            forecast[2].text + ', Min: ' + forecast[2].low + 'º' + weather.units.temperature + ', Max: ' + forecast[2].high + 'º' + weather.units.temperature + '\n\n' +
-
-                            emojiType(forecast[3].text) + ' *' + forecast[3].day + '*, ' + forecast[3].date + '\n' +
-                            forecast[3].text + ', Min: ' + forecast[3].low + 'º' + weather.units.temperature + ', Max: ' + forecast[3].high + 'º' + weather.units.temperature + '\n\n' +
-
-                            emojiType(forecast[4].text) + ' *' + forecast[4].day + '*, ' + forecast[4].date + '\n' +
-                            forecast[4].text + ', Min: ' + forecast[4].low + 'º' + weather.units.temperature + ', Max: ' + forecast[4].high + 'º' + weather.units.temperature
+                        '*Weekly Forecast*: \n' + forecastText
                 }];
 
                 slack._apiCall('chat.postMessage', {
