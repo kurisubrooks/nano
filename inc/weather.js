@@ -57,6 +57,9 @@ try {
 					forecast[i].text + ', Min: ' + forecast[i].low + 'º' + weather.units.temperature + ', Max: ' + forecast[i].high + 'º' + weather.units.temperature + '\n\n';
 				}
 
+				if (weather.atmosphere.pressure == '') var weather_pressure = 'Unknown';
+				else var weather_pressure = weather.atmosphere.pressure + weather.units.pressure;
+
 				var weatherAttach = [{
 					'color': '#2F84E0',
 					'fallback': 'Weather Report for ' + location.city,
@@ -67,7 +70,7 @@ try {
 						'*Condition*: ' + condition.text + '\n' +
 						'*Humidity*: ' + weather.atmosphere.humidity + '%\n' +
 						'*Wind Speed*: ' + weather.wind.speed + weather.units.speed + '\n' +
-						'*Pressure*: ' + weather.atmosphere.pressure + weather.units.pressure + '\n\n' +
+						'*Pressure*: ' + weather_pressure + '\n\n' +
 						'*Weekly Forecast*: \n' + forecastText
 				}];
 
