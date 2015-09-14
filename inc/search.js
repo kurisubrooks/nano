@@ -37,7 +37,7 @@ try {
 						channel: chan,
 						attachments: JSON.stringify(searchAttachments)
 					});
-				} else channel.send('*Error:* We couldn\'t find any results for: "' + searchText + '"');
+				} else channel.send('*Error:* Google didn\'t return any results for that query.');
 			});
 		}
 
