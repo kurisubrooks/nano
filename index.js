@@ -118,32 +118,24 @@ slack.on('message', function(message) {
 	}
 
 	if (type == 'message') {
+		if (text.contains('.')) eval(fs.readFileSync('./inc/mentions.js') + '');
 		if (text.startsWith('.')) {
 			// Basic Commands
 			eval(fs.readFileSync('./inc/commands.js') + '');
 
 			// Weather
-			if (text.startsWith('.weather')) eval(fs.readFileSync('./inc/weather.js') + '');
+			if (text.startsWith('.weather ')) eval(fs.readFileSync('./inc/weather.js') + '');
+			if (text == '.weather') channel.send('Where do you want me to get the weather for?');
 
 			// Google
-			if (text.startsWith('.search')) eval(fs.readFileSync('./inc/search.js') + '');
+			if (text.startsWith('.search ')) eval(fs.readFileSync('./inc/search.js') + '');
+			if (text == '.search') channel.send('I don\'t know what you want me to search!');
 		} else {
 			// Nano Mention
 			if (text == 'nano') channel.send('はい、何？');
 
 			// Rioka Greetings
-			if (user.name == 'rioka') {
-				if (text.contains('tadaima'))  		channel.send('おかえり、先輩 :sparkling_heart:');
-				else if (text.contains('leaving'))  channel.send('え？ 先輩、どこですか？ どこに行くの？ 先輩！？ :sob:');
-				else if (text.contains('crashing')) channel.send('え？ 大丈夫、先輩？ 大丈夫か！？');
-				else if (text.contains('crashed'))  channel.send('ああいや、ない再び！ 私は薬を取得しますよ..');
-			}
-
-			// Kaori Greetings
-			if (user.name == 'kaori') {
-				if (text.contains('leaving'))  		channel.send('え、かおりさま？ 行かないで！あっ.. 愛してる！');
-				else if (text.contains('tadaima'))  channel.send('先輩、あなたが死んでから戻って！〜 :sparkling_heart:');
-			}
+			if (user.name == 'rioka' && text.contains('crashed')) channel.send('ああいや、ない再び！ 私は薬を取得しますよ..');
 		}
 	}
 });
