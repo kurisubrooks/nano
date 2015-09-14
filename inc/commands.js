@@ -49,6 +49,11 @@ try {
 		}
 	}
 
+	// Remote Crash
+	if (user.name == 'kurisu' && text == '.exit') {
+		process.exit(0);
+	}
+
 	// Help Command
 	if (text == '.help') {
 		channel.send(
