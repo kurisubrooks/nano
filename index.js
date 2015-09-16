@@ -1,4 +1,4 @@
-var socket = require('socket.io-client')('http://ssh.kurisubrooks.com:3080');
+var socket = require('socket.io-client')('http://eew.kurisubrooks.com:3080');
 var Slack  = require('slack-client');
 var colors = require('colors');
 var fs = require('fs');
@@ -62,7 +62,7 @@ function new_quake(input) {
 		var message_attach = [{
 			'color': drill_colour,
 			'fallback': 'Earthquake - ' + data.epicenter_en + ', Seismic '	+ data.seismic_en,
-			'text': 'Epicenter: ' + data.epicenter_en + '\nMagnitude: ' + data.magnitude + ', Seismic: ' + data.seismic_en + ', Depth: ' + data.depth + 'km',
+			'text': 'Epicenter: ' + data.epicenter_en + '\nMagnitude: ' + data.magnitude + ', Seismic: ' + data.seismic_en + ', Depth: ' + data.depth,
 			'title': ':quake: An Earthquake has Occurred.'
 		}];
 	}
@@ -130,6 +130,10 @@ slack.on('message', function(message) {
 			// Google
 			if (text.startsWith('.search ')) eval(fs.readFileSync('./inc/search.js') + '');
 			if (text == '.search') channel.send('I don\'t know what you want me to search!');
+
+			// Translate
+			if (text.startsWith('.translate ')) eval(fs.readFileSync('./inc/translate.js') + '');
+			if (text == '.translate') channel.send('I don\'t know what you want me to translate!');
 		} else {
 			// Nano Mention
 			if (text == 'nano') channel.send('はい、何？');
