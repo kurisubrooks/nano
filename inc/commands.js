@@ -15,11 +15,13 @@ try {
 	// Say as Nano
 	if (user.name == 'kurisu' && text.startsWith('.say ')) {
 		var sayMsg = message.text;
-		var sayOut = sayMsg.replace('.say ', '');
+		var channelOut = sayMsg.split(" ")[1];
+		var sayTemp = sayMsg.substring(sayMsg.indexOf(" ") + 1);
+		var sayOut = sayTemp.substring(sayTemp.indexOf(" ") + 1);
 
 		slack._apiCall('chat.postMessage', {
 			as_user: true,
-			channel: '#general',
+			channel: channelOut,
 			text: sayOut
 		});
 	}
