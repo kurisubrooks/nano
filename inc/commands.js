@@ -14,15 +14,26 @@ try {
 
 	// Say as Nano
 	if (user.name == 'kurisu' && text.startsWith('.say ')) {
-		var sayMsg = message.text;
-		var channelOut = sayMsg.split(" ")[1];
-		var sayTemp = sayMsg.substring(sayMsg.indexOf(" ") + 1);
-		var sayOut = sayTemp.substring(sayTemp.indexOf(" ") + 1);
+		var input = message.text;
+		var channel_out = input.split(' ')[1].replace('[<\#>]','');
+		var say_temp = input.substring(input.indexOf(" ") + 1);
+		var say_out = say_temp.substring(say_temp.indexOf(" ") + 1);
+
+		//channel.send(channel_out + ' & ' + say_out)
 
 		slack._apiCall('chat.postMessage', {
 			as_user: true,
-			channel: channelOut,
-			text: sayOut
+			channel: channel_out,
+			'text': 'hi'
+		});
+
+		channel.send(slack.getChannelGroupOrDMByID(channel_out));
+		channel.send(chan);
+
+		slack._apiCall('chat.postMessage', {
+			as_user: true,
+			channel: chan,
+			text: 'text'
 		});
 	}
 }
