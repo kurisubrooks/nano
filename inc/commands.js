@@ -5,7 +5,7 @@ try {
 	}
 
 	// Help Command
-	if (text == '.help') {
+	else if (text == '.help') {
 		channel.send(
 			'`.search %query` - Search Google with %query' + '\n' +
 			'`.weather %place` - Get the Weather for %place' + '\n' +
@@ -13,28 +13,18 @@ try {
 	}
 
 	// Say as Nano
-	if (user.name == 'kurisu' && text.startsWith('.say ')) {
+	else if (user.name == 'kurisu' && text.startsWith('.say ')) {
 		var input = message.text;
-		var channel_out = input.split(' ')[1].replace('[<\#>]','');
-		var say_temp = input.substring(input.indexOf(" ") + 1);
-		var say_out = say_temp.substring(say_temp.indexOf(" ") + 1);
+        var args = input.replace('.say ', '').split(' ');
+        if(args[0].startsWith('<') && args[0].endsWith('>') && args.length > 1) {
+            var splitNumber = 3;
+            var toChannel = args[0].substr(splitNumber - 1, args[0].length - splitNumber);
 
-		//channel.send(channel_out + ' & ' + say_out)
-
-		slack._apiCall('chat.postMessage', {
-			as_user: true,
-			channel: channel_out,
-			'text': 'hi'
-		});
-
-		channel.send(slack.getChannelGroupOrDMByID(channel_out));
-		channel.send(chan);
-
-		slack._apiCall('chat.postMessage', {
-			as_user: true,
-			channel: chan,
-			text: 'text'
-		});
+            var text = args.join(' ').replace(new RegExp('^' + args[0] + ' '), '');
+            slack.getChannelGroupOrDMByID(toChannel).send(text);
+        } else {
+            channel.send(args.join(' '));
+        }
 	}
 }
 

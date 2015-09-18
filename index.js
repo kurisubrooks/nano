@@ -40,7 +40,7 @@ function new_quake(input) {
 	if (data.situation == 1) var situation_string = 'Final';
 	else var situation_string = '#' + (Number(data.revision) - 1);
 
-	if (data.drill == true) var drill_colour = '#FFE200';
+	if (data.drill === true) var drill_colour = '#FFE200';
 	else var drill_colour = 'danger';
 
 	var title_string =
@@ -125,21 +125,17 @@ slack.on('message', function(message) {
 
 			// Weather
 			if (text.startsWith('.weather ')) eval(fs.readFileSync('./inc/weather.js') + '');
-			if (text == '.weather') channel.send('Where do you want me to get the weather for?');
+			else if (text == '.weather') channel.send('Where do you want me to get the weather for?');
 
 			// Google
 			if (text.startsWith('.search ')) eval(fs.readFileSync('./inc/search.js') + '');
-			if (text == '.search') channel.send('I don\'t know what you want me to search!');
-
-			// Translate
-			if (text.startsWith('.translate ')) eval(fs.readFileSync('./inc/translate.js') + '');
-			if (text == '.translate') channel.send('I don\'t know what you want me to translate!');
+			else if (text == '.search') channel.send('I don\'t know what you want me to search!');
 		} else {
 			// Nano Mention
 			if (text == 'nano') channel.send('はい、何？');
 
 			// Rioka Greetings
-			if (user.name == 'rioka' && text.contains('crashed')) channel.send('ああいや、ない再び！ 私は薬を取得しますよ..');
+			else if (user.name == 'rioka' && text.contains('crashed')) channel.send('ああいや、ない再び！ 私は薬を取得しますよ..');
 		}
 	}
 });
