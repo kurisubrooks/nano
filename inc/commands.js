@@ -1,6 +1,6 @@
 try {
 	// Remote Crash
-	if (user.name == 'kurisu' && text == '.exit') {
+	if (user == slack.getUserByID('U07RLJWDC') && text == '.exit') {
 		process.exit(0);
 	}
 
