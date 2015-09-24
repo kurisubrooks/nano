@@ -122,6 +122,7 @@ slack.on('message', function(message) {
 		if (text.startsWith('.')) {
 			// Basic Commands
 			eval(fs.readFileSync('./inc/commands.js') + '');
+			eval(fs.readFileSync('./inc/gifs.js') + '');
 
 			// Weather
 			if (text.startsWith('.weather ')) eval(fs.readFileSync('./inc/weather.js') + '');
