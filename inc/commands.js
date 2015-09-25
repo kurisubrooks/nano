@@ -1,7 +1,18 @@
 try {
 	// Remote Crash
 	if (user == slack.getUserByID('U07RLJWDC') && text == '.exit') {
-		process.exit(0);
+		var attach = [{
+			'fallback': 'brb',
+			'image_url': 'http://i.imgur.com/kiKRmYY.gif'
+		}];
+
+		slack._apiCall('chat.postMessage', {
+			'as_user': true,
+			'channel': chan,
+			'attachments': JSON.stringify(attach)
+		}, function(){
+			process.exit(0);
+		});
 	}
 
 	// Help Command
