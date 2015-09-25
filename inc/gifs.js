@@ -23,7 +23,7 @@ try {
 		else if (text.contains('.idgaf')) 	gif('http://i.imgur.com/YiCUeTP.gif', 'idgaf');
 		else if (text.contains('.lisa')) 	gif('http://i.imgur.com/T4QoI4x.gif', 'fk u lisa');
 		else if (text.contains('.lonely')) 	gif('http://i.imgur.com/u2Fy5VV.gif', 'cry evritym');
-		else if (text.contains('.nojoke')) 	gif('http://i.imgur.com/v4NsQhC.gif', 'joke ^ head + calc');
+		else if (text.contains('.joke')) 	gif('http://i.imgur.com/v4NsQhC.gif', 'joke ^ head + calc');
 		else if (text.contains('.nom')) 	gif('http://i.imgur.com/OpOynkt.gif', 'nomnomnom');
 		else if (text.contains('.baka')) 	gif('http://i.imgur.com/XUbzeIA.gif', 'wot a baka');
 		else if (text.contains('.stfu'))	gif('http://i.imgur.com/NvBcf1R.gif', 'shuddap');
@@ -38,6 +38,10 @@ try {
 		else if (text.contains('.fab')) 		gif('https://media.giphy.com/media/huWUrrBko12Cc/giphy.gif', 'wow so fab');
 		else if (text.contains('.cries')) 		gif('https://media.giphy.com/media/wzRfW1SV1DSec/giphy.gif', ':<');
 		else if (text.contains('.hi'))			gif('https://media.giphy.com/media/ybstSlIgIEhQA/giphy.gif', 'hi pls');
+		else if (text.contains('.uso'))			gif('http://i1.kym-cdn.com/entries/icons/original/000/018/847/e4a829e2-502a-42d4-898f-f3169442026b-bestSizeAvailable.png', 'y da fuk u lyin');
+		else if (text.contains('.spoilers'))	gif('http://i.imgur.com/062kUsx.gif', 'ssh, spoilers');
+		else if (text.contains('.wow'))			gif('http://i1.kym-cdn.com/photos/images/facebook/000/612/917/02d.gif', 'wow');
+		else if (text.contains('.soon'))		gif('http://1.bp.blogspot.com/-yRKdiyePiCI/U7Lp4r1J9VI/AAAAAAAABdU/zKIdHlpfODU/s1600/soon+cat.gif', '#soon');
 	}
 }
 
