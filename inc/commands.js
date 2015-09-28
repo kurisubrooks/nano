@@ -17,10 +17,21 @@ try {
 
 	// Help Command
 	else if (text == '.help') {
-		channel.send(
-			'`.search %query` - Search Google with %query' + '\n' +
-			'`.weather %place` - Get the Weather for %place' + '\n' +
-			'`.shrug`, `.kawaii`, `.close`, `.nya`, `.flip`, `.lenny`, `.cries`, `.meep`, `.nbc`, `.facepalm`, `.no`, `.why`');
+		var massage = [{
+			'fallback': 'Query Results',
+			'pretext': 'Hakase has provided me with the following features...',
+			'mrkdwn_in': ['text'],
+			'text': '`.search  %s` – Search the Internet \n' +
+					'`.weather %s` – Gets the Weather \n' +
+					'`.gifs` – Lists all available gifs \n\n' +
+					'Wanna translate some text? Ask my senpai, <@rioka>!'
+		}];
+
+		slack._apiCall('chat.postMessage', {
+			'as_user': true,
+			'channel': chan,
+			'attachments': JSON.stringify(massage)
+		});
 	}
 
 	// Say as Nano
