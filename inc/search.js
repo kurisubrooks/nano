@@ -4,7 +4,7 @@ try {
 	var searchText = text.remove(8, text.length).replace(/\s+/g, '+');
 	var url = 'https://www.googleapis.com/customsearch/v1?key=' + googleToken + '&num=1&cx=006735756282586657842:s7i_4ej9amu&q=' + encodeURIComponent(searchText);
 
-	channel.send(random());
+	//channel.send(random());
 	http.get(url, function(res) {
 		if (res.statusCode == 200) {
 			var data = '';

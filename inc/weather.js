@@ -2,37 +2,37 @@ try {
 	var YQL = require('yql');
 
 	function emojiType(condition) {
-		if	  (condition == 'Tornado')				return ':cyclone::dash:';
-		else if (condition == 'Tropical Storm')		 return ':cyclone::dash::sweat_drops:';
-		else if (condition == 'Hurricane')			  return ':cyclone::dash:';
+		if	  (condition == 'Tornado')					return ':cyclone::dash:';
+		else if (condition == 'Tropical Storm')		 	return ':cyclone::dash::sweat_drops:';
+		else if (condition == 'Hurricane')			  	return ':cyclone::dash:';
 		else if (condition == 'Mixed Rain and Snow')	return ':umbrella::snowflake:';
 		else if (condition == 'Mixed Rain and Sleet')   return ':umbrella::snowflake:';
 		else if (condition == 'Mixed Snow and Sleet')   return ':snowflake:';
 		else if (condition == 'Drizzle')				return ':sweat_drops:';
-		else if (condition == 'Blustery')			   return ':leaves::dash:';
+		else if (condition == 'Blustery')			   	return ':leaves::dash:';
 		else if (condition == 'Mixed Rain and Hail')	return ':umbrella::snowflake:';
-		else if (condition == 'Snow Showers')		   return ':snowflake::umbrella:';
+		else if (condition == 'Snow Showers')		   	return ':snowflake::umbrella:';
 		else if (condition == 'Hot')					return ':sunny::sweat:';
-		else if (condition == 'Cold')				   return ':snowflake::cold_sweat:';
-		else if (condition == 'AM Showers')			 return ':sunny: :umbrella:';
-		else if (condition == 'PM Showers')			 return ':crescent_moon: :umbrella:';
+		else if (condition == 'Cold')				   	return ':snowflake::cold_sweat:';
+		else if (condition == 'AM Showers')			 	return ':sunny: :umbrella:';
+		else if (condition == 'PM Showers')			 	return ':crescent_moon: :umbrella:';
 		else if (condition.contains('Freezing'))		return ':snowflake:';
 		else if (condition.contains('Snow'))			return ':snowflake:';
 		else if (condition.contains('Hail'))			return ':snowflake:';
-		else if (condition.contains('Sleet'))		   return ':snowflake:';
+		else if (condition.contains('Sleet'))		   	return ':snowflake:';
 		else if (condition.contains('Dust'))			return ':dash:';
-		else if (condition.contains('Fog'))			 return ':dash:';
+		else if (condition.contains('Fog'))			 	return ':dash:';
 		else if (condition.contains('Haze'))			return ':dash:';
 		else if (condition.contains('Smok'))			return ':fire::dash:';
 		else if (condition.contains('Wind'))			return ':leaves::dash:';
-		else if (condition.contains('Partly'))		  return ':partly_sunny:';
-		else if (condition.contains('Mostly'))		  return ':partly_sunny:';
-		else if (condition.contains('Cloudy'))		  return ':cloud:';
-		else if (condition.contains('Clear'))		   return ':sunny:';
-		else if (condition.contains('Sun'))			 return ':sunny:';
+		else if (condition.contains('Partly'))		  	return ':partly_sunny:';
+		else if (condition.contains('Mostly'))		  	return ':partly_sunny:';
+		else if (condition.contains('Cloudy'))		  	return ':cloud:';
+		else if (condition.contains('Clear'))		   	return ':sunny:';
+		else if (condition.contains('Sun'))			 	return ':sunny:';
 		else if (condition.contains('Fair'))			return ':sunny:';
-		else if (condition.contains('Thunder'))		 return ':zap::umbrella:';
-		else if (condition.contains('Showers'))		 return ':umbrella:';
+		else if (condition.contains('Thunder'))		 	return ':zap::umbrella:';
+		else if (condition.contains('Showers'))		 	return ':umbrella:';
 		else if (condition.contains('Rain'))			return ':umbrella:';
 		else											return ':question:';
 	}
@@ -40,9 +40,9 @@ try {
 	var weather_out = message.text.replace('.weather ', '');
 	var query = new YQL('select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="' + weather_out + '") and u="c"');
 
-	channel.send(random());
-	query.exec(function(err, data) {
-		if (err) channel.send('*Error:* There was a problem with your request.');
+	//channel.send(random());
+	query.exec(function(error, data) {
+		if (error) channel.send('*Error:* There was a problem with your request: ```' + error + '```');
 		else {
 			if (data.query.results === null) channel.send('*Error:* Place not found.');
 			else if (data.query.results !== null) {
