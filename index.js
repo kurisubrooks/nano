@@ -30,7 +30,7 @@ socket.on('disconnect', function() {
 	slack._apiCall('chat.postMessage', {
 		as_user: true,
 		channel: '#general',
-		text: '*Error:* Connection to Socket dropped.'
+		text: '*Error:* Connection to EEW socket dropped.'
 	});
 });
 
@@ -42,6 +42,8 @@ function new_quake(input) {
 
 	if (data.drill === true) var drill_colour = '#FFE200';
 	else var drill_colour = 'danger';
+
+	/*
 
 	var title_string =
 		data.earthquake_time + ' - ' + data.epicenter_en;
@@ -58,6 +60,8 @@ function new_quake(input) {
 		var quakeText = message_string;
 	}
 
+	*/
+
 	if (data.revision == 1) {
 		var message_attach = [{
 			'color': drill_colour,
@@ -73,7 +77,7 @@ function new_quake(input) {
 			'fallback': 'Earthquake - ' + data.epicenter_en + ', Seismic '	+ data.seismic_en,
 			'text': 'Epicenter: ' + data.epicenter_en + '\nMagnitude: ' + data.magnitude + ', Seismic: ' + data.seismic_en + ', Depth: ' + data.depth,
 			'title': 'Update ' + situation_string,
-			'image_url': 'http://images.zish.in/' + data.earthquake_id.replace('ND', '') + '.png'
+			'image_url': 'http://maps.googleapis.com/maps/api/staticmap?center=' + data.latitude + ',' + data.longitude + '&zoom=6&scale=1&size=400x300&maptype=roadmap&format=png&visual_refresh=true&markers=icon:!%7Cshadow:true%7C' + data.latitude + ',' + data.longitude
 		}];
 	}
 
@@ -81,8 +85,7 @@ function new_quake(input) {
 		var message_attach = [{
 			'color': drill_colour,
 			'fallback': 'Earthquake - ' + data.epicenter_en + ', Seismic '	+ data.seismic_en,
-			'text': 'Epicenter: ' + data.epicenter_en + '\nMagnitude: ' + data.magnitude + ', Seismic: ' + data.seismic_en + ', Depth: ' + data.depth,
-			'title': 'Update ' + situation_string
+			'text': 'Update ' + situation_string + ': ' + data.epicenter_en + '\nMagnitude: ' + data.magnitude + ', Seismic: ' + data.seismic_en + ', Depth: ' + data.depth
 		}];
 	}
 
