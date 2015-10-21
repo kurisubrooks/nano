@@ -84,8 +84,9 @@ function new_quake(input) {
 	else {
 		var message_attach = [{
 			'color': drill_colour,
+			'mrkdwn_in': ['text'],
 			'fallback': 'Earthquake - ' + data.epicenter_en + ', Seismic '	+ data.seismic_en,
-			'text': 'Update ' + situation_string + ': ' + data.epicenter_en + '\nMagnitude: ' + data.magnitude + ', Seismic: ' + data.seismic_en + ', Depth: ' + data.depth
+			'text': '*Update ' + situation_string + '*: ' + data.epicenter_en + '\nMagnitude: ' + data.magnitude + ', Seismic: ' + data.seismic_en + ', Depth: ' + data.depth
 		}];
 	}
 
