@@ -89,18 +89,16 @@ slack.on('message', function(message){
 			new_quake('{"type":"0","drill":false,"announce_time":"2015/10/24 13:27:37","earthquake_time":"2015/10/24 13:26:35","earthquake_id":"20151024132650","situation":"1","revision":"3","latitude":"42.8","longitude":"143.2","depth":"110km","epicenter_en":"Central Tokachi Subprefecture","epicenter_ja":"十勝地方中部","magnitude":"3.7","seismic_en":"2","seismic_ja":"2","geography":"land","alarm":"0"}');
 		}*/
 
-        if (text.startsWith('.')) {
-            if (text.startsWith('.search ')) {
-                search.run(slack, text, chan, channel, user);
-            } else if (text == '.search') channel.send('What am I supposed to look for?');
-
-            else if (text.startsWith('.weather ')) {
-				weather.run(slack, text, chan, channel, user);
-            } else if (text == '.weather') channel.send('Where am I supposed to look for?');
-        }
-
-        else if (text.contains('.')) {
-            commands.run(slack, text, chan, channel, user);
+        if (text.contains('.')) {
+            if(text.startsWith('.search')) {
+                if(text.join(" ").length > 1) search.run(slack, text, chan, channel, user);
+                else channel.send("What am I supposed to look for?");
+            } else if(text.startsWith('.weather')) {
+                if(text.join(" ").length > 1) weather.run(slack, text, chan, channel, user);
+                else channel.send('Where am I supposed to look for?');
+            } else {
+                commands.run(slack, text, chan, channel, user);
+            }
         }
     }
 });
