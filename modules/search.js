@@ -46,7 +46,7 @@ exports.run = function(slack, text, chan, channel, user){
     	            }
 
     				else {
-    					channel.send('*Error:* Sorry, I couldn\'t find anything about this in the Library.');
+    					channel.send('*Error:* Sorry, I couldn\'t find that book. Maybe the nargles took it...');
     				}
     	        });
     		}
