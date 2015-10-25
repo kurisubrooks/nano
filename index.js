@@ -90,11 +90,11 @@ slack.on('message', function(message){
 		}*/
 
         if (text.contains('.')) {
-            if(text.startsWith('.search')) {
-                if(text.join(" ").length > 1) search.run(slack, text, chan, channel, user);
+            if (text.startsWith('.search')) {
+                if (text.join(" ").length > 1) search.run(slack, text, chan, channel, user);
                 else channel.send("What am I supposed to look for?");
-            } else if(text.startsWith('.weather')) {
-                if(text.join(" ").length > 1) weather.run(slack, text, chan, channel, user);
+            } else if (text.startsWith('.weather')) {
+                if (text.join(" ").length > 1) weather.run(slack, text, chan, channel, user);
                 else channel.send('Where am I supposed to look for?');
             } else {
                 commands.run(slack, text, chan, channel, user);

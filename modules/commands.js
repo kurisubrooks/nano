@@ -14,7 +14,7 @@ exports.run = function(slack, text, chan, channel, user){
             'attachments': JSON.stringify(attachments)
         });
     }
-    
+
     try {
     	if (user != slack.getUserByID('U09218631')) {
     		if      (text.contains('.shrug'))	channel.send('¯\\_(ツ)_/¯');
