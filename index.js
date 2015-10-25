@@ -35,7 +35,7 @@ socket.on('connect', function(){
 });
 
 socket.on('data', function(data){
-	new_quake(data);
+	quake.run(slack, data);
 });
 
 socket.on('reconnect', function(){
@@ -79,10 +79,6 @@ slack.on('message', function(message){
     if (text === null) return;
 
 	logger.debug('Chat: ' + message);
-
-	function new_quake(data){
-        quake.run(slack, data);
-    }
 
     if (type == 'message') {
 		/*if (text == '.quakepls') {
