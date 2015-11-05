@@ -1,7 +1,7 @@
 {
-  "name": "luna",
-  "version": "0.0.1",
-  "description": "a slack bot that does magic",
+  "name": "nano",
+  "version": "0.0.9",
+  "description": "a totally human slack bot",
   "main": "index.js",
   "author": "kurisubrooks",
   "license": "ISC",
