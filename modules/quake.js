@@ -1,4 +1,4 @@
-var core = require('../core.js');
+var core = require('../core');
 var logger = require('lumios-toolkit');
 
 exports.run = function(slack, input){
@@ -14,7 +14,7 @@ exports.run = function(slack, input){
 			'color': core.error,
 			'fallback': 'Earthquake - ' + data.epicenter_en + ', Magnitude ' + data.magnitude,
 			'text': 'Epicenter: ' + data.epicenter_en + '\nMagnitude: ' + data.magnitude + ', Seismic: ' + data.seismic_en + ', Depth: ' + data.depth,
-			'title': ':quake: An Earthquake has Occurred.'
+			'title': ':quake: An Earthquake has Occurred!'
 		}];
 	}
 
@@ -24,7 +24,7 @@ exports.run = function(slack, input){
 			'fallback': 'Earthquake - ' + data.epicenter_en + ', Magnitude ' + data.magnitude,
 			'text': 'Epicenter: ' + data.epicenter_en + '\nMagnitude: ' + data.magnitude + ', Seismic: ' + data.seismic_en + ', Depth: ' + data.depth,
 			'title': 'Update ' + situation_string,
-			'image_url': 'http://maps.googleapis.com/maps/api/staticmap?center=' + data.latitude + ',' + data.longitude + '&zoom=6&scale=1&size=400x300&maptype=roadmap&format=png&visual_refresh=true&markers=icon:!%7Cshadow:true%7C' + data.latitude + ',' + data.longitude
+			'image_url': 'https://maps.googleapis.com/maps/api/staticmap?center=' + data.latitude + ',' + data.longitude + '&zoom=6&size=400x300&format=png&markers=' + data.latitude + ',' + data.longitude + '&maptype=roadmap&style=feature:landscape.natural.terrain|hue:0x00ff09|visibility:off&style=feature:water|saturation:-100|lightness:-79&style=feature:transit.line|visibility:off&style=feature:road.highway|visibility:simplified&style=feature:poi|visibility:off&style=feature:administrative.country|visibility:off&style=feature:road|visibility:off'
 		}];
 	}
 
