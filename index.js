@@ -10,6 +10,7 @@ var search = require('./modules/search');
 var weather = require('./modules/weather');
 var quake = require('./modules/quake');
 
+// Slack Socket
 var slackToken = keys.slack,
     autoReconnect = true,
     autoMark = true;
@@ -34,6 +35,7 @@ slack.on('team_migration_started', function(){
     });
 });
 
+// Earthquake Socket
 socket.on('connect', function(){
 	logger.success('Connected to Shake Server.');
 
@@ -78,6 +80,7 @@ socket.on('disconnect', function(){
 	});
 });
 
+// Parse Slack Messages
 slack.on('message', function(message){
     var channel = slack.getChannelGroupOrDMByID(message.channel);
     var user = slack.getUserByID(message.user);
@@ -91,9 +94,9 @@ slack.on('message', function(message){
 	logger.debug('Chat: ' + message);
 
     if (type == 'message') {
-		/*if (text == '.quakepls') {
-			new_quake('{"type":"0","drill":false,"announce_time":"2015/10/24 13:27:37","earthquake_time":"2015/10/24 13:26:35","earthquake_id":"20151024132650","situation":"1","revision":"3","latitude":"42.8","longitude":"143.2","depth":"110km","epicenter_en":"Central Tokachi Subprefecture","epicenter_ja":"十勝地方中部","magnitude":"3.7","seismic_en":"2","seismic_ja":"2","geography":"land","alarm":"0"}');
-		}*/
+		if (text == '.quakepls' && user == slack.getUserByID('U07RLJWDC')) {
+            quake.run(slack, '{"type":"0","drill":false,"announce_time":"2015/10/24 13:27:37","earthquake_time":"2015/10/24 13:26:35","earthquake_id":"20151024132650","situation":"1","revision":"3","latitude":"42.8","longitude":"143.2","depth":"110km","epicenter_en":"Central Tokachi Subprefecture","epicenter_ja":"十勝地方中部","magnitude":"3.7","seismic_en":"2","seismic_ja":"2","geography":"land","alarm":"0"}');
+		}
 
         if (text.contains('.')) {
             if (text.startsWith('.search')) {
