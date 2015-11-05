@@ -6,7 +6,7 @@
   "author": "kurisubrooks",
   "license": "ISC",
   "dependencies": {
-    "lumios-toolkit": "0.0.5",
+    "lumios-toolkit": "0.0.6",
     "slack-client": "^1.4.1",
     "socket.io-client": "^1.3.7",
     "yql": "^1.0.2"
