@@ -5,10 +5,10 @@ var Slack = require('slack-client');
 var logger = require('lumios-toolkit');
 var socket = require('socket.io-client')(keys.socket);
 
-var commands = require('./modules/commands.js');
-var search = require('./modules/search.js');
-var weather = require('./modules/weather.js');
-var quake = require('./modules/quake.js');
+var commands = require('./modules/commands');
+var search = require('./modules/search');
+var weather = require('./modules/weather');
+var quake = require('./modules/quake');
 
 var slackToken = keys.slack,
     autoReconnect = true,
@@ -22,6 +22,16 @@ slack.on('open', function(){
 
 slack.on('error', function(err){
     logger.error('Slack threw an error: ' + err);
+});
+
+slack.on('team_migration_started', function(){
+    logger.error('Slack is migrating servers. Closing connection...');
+
+    slack._apiCall('chat.postMessage', {
+        as_user: true,
+        channel: '#general',
+        text: '*Notice*: Slack is migrating servers. Be back soon!'
+    });
 });
 
 socket.on('connect', function(){
