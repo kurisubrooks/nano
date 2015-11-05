@@ -1,6 +1,6 @@
 var YQL = require('yql');
-var keys = require('../keys.js');
-var core = require('../core.js');
+var keys = require('../keys');
+var core = require('../core');
 
 exports.run = function(slack, text, chan, channel, user){
 	try {
