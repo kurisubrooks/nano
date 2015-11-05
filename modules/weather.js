@@ -1,4 +1,4 @@
-var YQL = require('YQL');
+var YQL = require('yql');
 var keys = require('../keys.js');
 var core = require('../core.js');
 
