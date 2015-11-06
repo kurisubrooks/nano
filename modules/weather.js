@@ -10,7 +10,7 @@ exports.run = function(slack, text, time, chan, channel, user){
 		query.exec(function(error, data) {
 			if (error) channel.send(core.errno + '```' + error + '```');
 			else {
-				if (data.query.results === null) channel.send('*Error:* I can\'t seem to find that place... The nargles must have messed with my map...');
+				if (data.query.results === null) channel.send('*Error*: Your query returned no results.');
 				else if (data.query.results !== null) {
 					var weather = data.query.results.channel;
 					var location = data.query.results.channel.location;

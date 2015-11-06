@@ -18,32 +18,34 @@ var slackToken = keys.slack,
 var slack = new Slack(slackToken, autoReconnect, autoMark);
 
 slack.on('open', function(){
-    logger.success('Connected to Slack.');
+    logger.success('Successfully connected to Slack.');
 });
 
 slack.on('error', function(err){
-    logger.error('Slack threw an error: ' + err);
+    logger.error('Slack > ' + err);
 });
 
 slack.on('team_migration_started', function(){
-    logger.error('Slack is migrating servers. Closing connection...');
+    logger.error('Slack > Migrating Servers, Restarting...');
 
     slack._apiCall('chat.postMessage', {
         as_user: true,
         channel: '#general',
-        text: '*Notice*: Slack is migrating servers. Be back soon!'
+        text: '*Notice*: Slack is migrating servers. Rioka & I will be back soon!'
     });
 });
 
 // Earthquake Socket
 socket.on('connect', function(){
-	logger.success('Connected to Shake Server.');
+	logger.success('Successfully connected to Shake.');
 
-    slack._apiCall('chat.postMessage', {
-		as_user: true,
-		channel: '#general',
-		text: 'Connected to Shake Server.'
-	});
+    if (!core.debug) {
+        slack._apiCall('chat.postMessage', {
+    		as_user: true,
+    		channel: '#general',
+    		text: 'Connected to Shake.'
+    	});
+    }
 });
 
 socket.on('data', function(data){
@@ -51,32 +53,32 @@ socket.on('data', function(data){
 });
 
 socket.on('reconnect', function(){
-    logger.warn('Attempting to reconnect...');
+    logger.warn('Disconnected from Shake, reconnecting...');
 
     slack._apiCall('chat.postMessage', {
 		as_user: true,
 		channel: '#general',
-		text: 'Attempting to reconnect to server...'
+		text: '*Notice*: Disconnected from Shake, reconnecting...'
 	});
 });
 
 socket.on('error', function(err){
-    logger.error('Error connecting to Shake Server: ' + err);
+    logger.error('Shake > ' + err);
 
     slack._apiCall('chat.postMessage', {
 		as_user: true,
 		channel: '#general',
-		text: '*Error:* There was an error connecting to Shake Server: ```' + err + '```'
+		text: '*Error*: Encountered a problem while connecting to Shake: ```' + err + '```'
 	});
 });
 
 socket.on('disconnect', function(){
-    logger.error('Connection to Shake Server was lost!');
+    logger.error('Shake > Connection lost!');
 
 	slack._apiCall('chat.postMessage', {
 		as_user: true,
 		channel: '#general',
-		text: '*Error:* Connection to Shake Server was lost!'
+		text: '*Error*: Connection to Shake Server was lost!'
 	});
 });
 
@@ -89,28 +91,32 @@ slack.on('message', function(message){
     var text = message.text;
 	var time = message.ts;
 
+    // Fixes Crash on Message Deletion
     if (user === undefined) return;
     if (text === null) return;
 
-	logger.debug('Chat: ' + message);
+    // Outputs + Logs Chat
+	logger.debug('Chat > ' + message);
 
     if (type == 'message') {
-		if (text == '.quakepls' && user == slack.getUserByID('U07RLJWDC')) {
-            quake.run(slack, '{"type":"0","drill":false,"announce_time":"2015/10/24 13:27:37","earthquake_time":"2015/10/24 13:26:35","earthquake_id":"20151024132650","situation":"1","revision":"3","latitude":"42.8","longitude":"143.2","depth":"110km","epicenter_en":"Central Tokachi Subprefecture","epicenter_ja":"十勝地方中部","magnitude":"3.7","seismic_en":"2","seismic_ja":"2","geography":"land","alarm":"0"}');
-			core.delMsg(slack, chan, time);
-		}
-
+        // Commands
         if (text.contains('.')) {
             if (text.startsWith('.search')) {
-                if (text.split(" ").length > 1) search.run(slack, text, time, chan, channel, user);
-                else channel.send("What am I supposed to look for?");
+                if (text.split(' ').length > 1) search.run(slack, text, time, chan, channel, user);
+                else channel.send('Sorry ' + user.name + ', but what am I supposed to search for?');
             } else if (text.startsWith('.weather')) {
-                if (text.split(" ").length > 1) weather.run(slack, text, time, chan, channel, user);
-                else channel.send('Where am I supposed to look for?');
+                if (text.split(' ').length > 1) weather.run(slack, text, time, chan, channel, user);
+                else channel.send('Sorry ' + user.name + ', but where am I supposed to get the weather for?');
             } else {
                 commands.run(slack, text, time, chan, channel, user);
             }
         }
+
+        // Earthquake Debugging
+		else if (text == '.quakepls' && user == slack.getUserByID('U07RLJWDC')) {
+            quake.run(slack, '{"type":"0","drill":false,"announce_time":"2015/10/24 13:27:37","earthquake_time":"2015/10/24 13:26:35","earthquake_id":"20151024132650","situation":"1","revision":"3","latitude":"42.8","longitude":"143.2","depth":"110km","epicenter_en":"Central Tokachi Subprefecture","epicenter_ja":"十勝地方中部","magnitude":"3.7","seismic_en":"2","seismic_ja":"2","geography":"land","alarm":"0"}');
+			core.delMsg(slack, chan, time);
+		}
     }
 });
 

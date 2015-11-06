@@ -46,15 +46,15 @@ exports.run = function(slack, text, time, chan, channel, user){
     	            }
 
     				else {
-    					channel.send('*Error:* Sorry, I couldn\'t find that book. Maybe the nargles took it...');
+    					channel.send('*Error:* The search returned no results.');
     				}
     	        });
     		}
 
     		else if (res.statusCode != 200){
-    			if (res.statusCode == 403) channel.send('*Error:* I read too many books today. Madam Pince won\'t let me back in.');
-    			else if (res.statusCode == 500) channel.send('*Error:* The library\'s on fire! Must be nargles...');
-    			else channel.send('*Error:* A book.. of numbers? *' + res.statusCode + '*');
+    			if (res.statusCode == 403) channel.send('*Error*: Exceeded Maximum daily API calls.');
+    			else if (res.statusCode == 500) channel.send('*Error*: An unknown error has occurred.');
+    			else channel.send('*Error*: Unknown error, #*' + res.statusCode + '*');
     		}
         })
 

@@ -7,7 +7,9 @@ exports.error = '#E93F3C';
 exports.warn = '#F5AD1E';
 exports.info = '#52B7D6';
 
-exports.errno = 'Oh no, must be the nargles... ';
+exports.debug = false;
+
+exports.errno = '*Error*: There was a problem with your request: ';
 
 exports.delMsg = function(slack, channel, timestamp) {
 	var query = '?token=' + keys.user + '&ts=' + timestamp + '&channel=' + channel;
