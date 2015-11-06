@@ -1,5 +1,5 @@
-var core = require('./core.js');
-var keys = require('./keys.js');
+var core = require('./modules/core');
+var keys = require('./keys');
 
 var Slack = require('slack-client');
 var logger = require('lumios-toolkit');
@@ -87,6 +87,7 @@ slack.on('message', function(message){
     var chan = message.channel;
     var type = message.type;
     var text = message.text;
+	var time = message.ts;
 
     if (user === undefined) return;
     if (text === null) return;
@@ -96,17 +97,18 @@ slack.on('message', function(message){
     if (type == 'message') {
 		if (text == '.quakepls' && user == slack.getUserByID('U07RLJWDC')) {
             quake.run(slack, '{"type":"0","drill":false,"announce_time":"2015/10/24 13:27:37","earthquake_time":"2015/10/24 13:26:35","earthquake_id":"20151024132650","situation":"1","revision":"3","latitude":"42.8","longitude":"143.2","depth":"110km","epicenter_en":"Central Tokachi Subprefecture","epicenter_ja":"十勝地方中部","magnitude":"3.7","seismic_en":"2","seismic_ja":"2","geography":"land","alarm":"0"}');
+			core.delMsg(slack, chan, time);
 		}
 
         if (text.contains('.')) {
             if (text.startsWith('.search')) {
-                if (text.split(" ").length > 1) search.run(slack, text, chan, channel, user);
+                if (text.split(" ").length > 1) search.run(slack, text, time, chan, channel, user);
                 else channel.send("What am I supposed to look for?");
             } else if (text.startsWith('.weather')) {
-                if (text.split(" ").length > 1) weather.run(slack, text, chan, channel, user);
+                if (text.split(" ").length > 1) weather.run(slack, text, time, chan, channel, user);
                 else channel.send('Where am I supposed to look for?');
             } else {
-                commands.run(slack, text, chan, channel, user);
+                commands.run(slack, text, time, chan, channel, user);
             }
         }
     }

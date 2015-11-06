@@ -1,4 +1,4 @@
-var core = require('../core');
+var core = require('./core');
 var logger = require('lumios-toolkit');
 
 exports.run = function(slack, input){

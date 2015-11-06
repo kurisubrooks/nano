@@ -1,8 +1,8 @@
 var YQL = require('yql');
 var keys = require('../keys');
-var core = require('../core');
+var core = require('./core');
 
-exports.run = function(slack, text, chan, channel, user){
+exports.run = function(slack, text, time, chan, channel, user){
 	try {
 		var weather_out = text.replace('.weather ', '');
 		var query = new YQL('select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="' + weather_out + '") and u="c"');
@@ -45,7 +45,7 @@ exports.run = function(slack, text, chan, channel, user){
 						'as_user': true,
 						'channel': chan,
 						'attachments': JSON.stringify(weatherAttach)
-					});
+					}, core.delMsg(slack, chan, time));
 				}
 			}
 		});

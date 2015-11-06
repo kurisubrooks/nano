@@ -1,21 +1,20 @@
-var core = require('../core');
+var core = require('./core');
 var logger = require('lumios-toolkit');
 
-exports.run = function(slack, text, chan, channel, user){
+exports.run = function(slack, text, time, chan, channel, user){
     function gif(url) {
-        var attachments = [{
-            'fallback': 'Here\'s something to annoy Paul with:',
-            'image_url': url
-        }];
-
         slack._apiCall('chat.postMessage', {
             'as_user': true,
             'channel': chan,
-            'attachments': JSON.stringify(attachments)
+            'attachments': JSON.stringify({
+	            'fallback': 'Here\'s something to annoy Paul with:',
+	            'image_url': url
+	        })
         });
     }
 
     function checkText(input) {
+		if (input == text) core.delMsg(slack, chan, time);
         return text == input || text.contains(' ' + input);
     }
 
@@ -50,39 +49,36 @@ exports.run = function(slack, text, chan, channel, user){
 
             else if (text == '.gifs') {
                 channel.send('`.baka`, `.clap`, `.crash`, `.cri`, `.deal`, `.facepalm`, `.idiot`, `.joke`, `.mindblown`, `.no`, `.nya`, `.pantsu`, `.sleep`, `.soon`, `.uso`, `.wat`, `.wow`');
+				core.delMsg(slack, chan, time);
             }
 
             else if (user == slack.getUserByID('U07RLJWDC') && text == '.exit') {
-        		var attach = [{
-        			'fallback': 'Restarting..',
-        			'image_url': 'http://i.imgur.com/kiKRmYY.gif'
-        		}];
-
         		slack._apiCall('chat.postMessage', {
         			'as_user': true,
         			'channel': chan,
-        			'attachments': JSON.stringify(attach)
+        			'attachments': JSON.stringify([{
+	        			'fallback': 'Restarting..',
+	        			'image_url': 'http://i.imgur.com/kiKRmYY.gif'
+	        		}])
         		}, function(){
         			process.exit(0);
         		});
         	}
 
             else if (text == '.help') {
-        		var massage = [{
-        			'fallback': 'Query Results',
-        			'pretext': 'I can do the following:',
-        			'mrkdwn_in': ['text'],
-        			'text': '`.search  %s` – Search the Internet \n' +
-        					'`.weather %s` – Gets the Weather \n' +
-        					'`.gifs` – Lists all available gifs \n\n' +
-        					'Wanna translate some text? Ask my itoko, <@rioka>!'
-        		}];
-
         		slack._apiCall('chat.postMessage', {
         			'as_user': true,
         			'channel': chan,
-        			'attachments': JSON.stringify(massage)
-        		});
+        			'attachments': JSON.stringify([{
+	        			'fallback': 'Query Results',
+	        			'pretext': 'I can do the following:',
+	        			'mrkdwn_in': ['text'],
+	        			'text': '`.search  %s` – Search the Internet \n' +
+	        					'`.weather %s` – Gets the Weather \n' +
+	        					'`.gifs` – Lists all available gifs \n\n' +
+	        					'Wanna translate some text? Ask my itoko, <@rioka>!'
+	        		}])
+        		}, core.delMsg(slack, chan, time));
         	}
 
             else if (user == slack.getUserByID('U07RLJWDC') && text.startsWith('.say ')) {
@@ -90,12 +86,21 @@ exports.run = function(slack, text, chan, channel, user){
                 var args = input.replace('.say ', '').split(' ');
                 if (args[0].startsWith('<') && args[0].endsWith('>') && args.length > 1) {
                     var splitNumber = 3;
-                    var toChannel = args[0].substr(splitNumber - 1, args[0].length - splitNumber);
+                    var toChannel = args[0].substring(splitNumber - 1, args[0].length - splitNumber);
 
                     var out = args.join(' ').replace(new RegExp('^' + args[0] + ' '), '');
-                    slack.getChannelGroupOrDMByID(toChannel).send(out);
+
+					slack._apiCall('chat.postMessage', {
+	        			'as_user': true,
+	        			'channel': toChannel,
+						'text': out
+	        		}, core.delMsg(slack, chan, time));
                 } else {
-                    channel.send(args.join(' '));
+					slack._apiCall('chat.postMessage', {
+	        			'as_user': true,
+	        			'channel': chan,
+						'text': args.join(' ')
+	        		}, core.delMsg(slack, chan, time));
                 }
         	}
         }

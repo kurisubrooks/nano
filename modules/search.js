@@ -1,8 +1,8 @@
 var http = require('https');
 var keys = require('../keys');
-var core = require('../core');
+var core = require('./core');
 
-exports.run = function(slack, text, chan, channel, user){
+exports.run = function(slack, text, time, chan, channel, user){
     try {
         var search_text = text.substring(8, text.length).replace(/\s+/g, '+');
         var url = 'https://www.googleapis.com/customsearch/v1?key=' + keys.google + '&num=1&cx=006735756282586657842:s7i_4ej9amu&q=' + encodeURIComponent(search_text);
@@ -42,7 +42,7 @@ exports.run = function(slack, text, chan, channel, user){
     						unfurl_media: false,
     						channel: chan,
     						attachments: JSON.stringify(attachments)
-    	                });
+    	                }, core.delMsg(slack, chan, time));
     	            }
 
     				else {
