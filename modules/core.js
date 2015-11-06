@@ -14,8 +14,9 @@ exports.delMsg = function(slack, channel, timestamp) {
 
 	https.get("https://slack.com/api/chat.delete" + query, function(res) {
 		var body = '';
-        res.on('data', function(data) {body += data;});
-        res.on('end', function() {});
+		res.on('data', function(data) {
+			body += data;
+		});
 	})
 	.on('error', function(error) {logger.error(error);});
 };
