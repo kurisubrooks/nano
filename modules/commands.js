@@ -6,10 +6,10 @@ exports.run = function(slack, text, time, chan, channel, user){
         slack._apiCall('chat.postMessage', {
             'as_user': true,
             'channel': chan,
-            'attachments': JSON.stringify({
+            'attachments': JSON.stringify([{
 	            'fallback': 'Here\'s something to annoy Paul with:',
 	            'image_url': url
-	        })
+	        }])
         });
     }
 
@@ -57,10 +57,11 @@ exports.run = function(slack, text, time, chan, channel, user){
         			'as_user': true,
         			'channel': chan,
         			'attachments': JSON.stringify([{
-	        			'fallback': 'Restarting..',
+	        			'fallback': 'brb',
 	        			'image_url': 'http://i.imgur.com/kiKRmYY.gif'
 	        		}])
         		}, function(){
+                    core.delMsg(slack, chan, time);
         			process.exit(0);
         		});
         	}
