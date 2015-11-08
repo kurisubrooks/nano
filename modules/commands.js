@@ -46,9 +46,10 @@ exports.run = function(slack, text, time, chan, channel, user){
             else if (checkText('.uso'))	    gif('http://1.bp.blogspot.com/-7aBesvnS7BM/Uo52S9PQSFI/AAAAAAAAPEg/WfQHOkmoi00/s1600/you-liar.gif');
             else if (checkText('.wow'))	    gif('http://i1.kym-cdn.com/photos/images/facebook/000/612/917/02d.gif');
             else if (checkText('.soon'))	gif('http://1.bp.blogspot.com/-yRKdiyePiCI/U7Lp4r1J9VI/AAAAAAAABdU/zKIdHlpfODU/s1600/soon+cat.gif');
+            else if (checkText('.fuck'))	gif('https://38.media.tumblr.com/4ae724664b736d537d86dbb484a7f703/tumblr_n5t3ioGkeP1sdac4wo1_400.gif');
 
             else if (text == '.gifs') {
-                channel.send('`.baka`, `.clap`, `.crash`, `.cri`, `.deal`, `.facepalm`, `.idiot`, `.joke`, `.mindblown`, `.no`, `.nya`, `.pantsu`, `.sleep`, `.soon`, `.uso`, `.wat`, `.wow`');
+                channel.send('`.baka`, `.clap`, `.crash`, `.cri`, `.deal`, `.facepalm`, `.fuck`, `.idiot`, `.joke`, `.mindblown`, `.no`, `.nya`, `.pantsu`, `.sleep`, `.soon`, `.uso`, `.wat`, `.wow`');
 				core.delMsg(slack, chan, time);
             }
 
