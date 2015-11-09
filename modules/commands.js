@@ -19,7 +19,7 @@ exports.run = function(slack, text, time, chan, channel, user){
     }
 
     try {
-    	if (user != slack.getUserByID('U09218631')) {
+    	if (user != slack.getUserByID('U0E4WJNTX')) {
     		if      (checkText('.shrug'))   channel.send('¯\\_(ツ)_/¯');
     		else if (checkText('.kawaii'))  channel.send('(ﾉ◕ヮ◕)ﾉ*:・ﾟ✧');
     		else if (checkText('.flip'))	channel.send('(╯°□°）╯︵ ┻━┻)');
@@ -53,7 +53,7 @@ exports.run = function(slack, text, time, chan, channel, user){
 				core.delMsg(slack, chan, time);
             }
 
-            else if (user == slack.getUserByID('U07RLJWDC') && text == '.exit') {
+            else if (user == slack.getUserByID('U0E4ZL97H') && text == '.exit') {
         		slack._apiCall('chat.postMessage', {
         			'as_user': true,
         			'channel': chan,
@@ -83,7 +83,7 @@ exports.run = function(slack, text, time, chan, channel, user){
         		}, core.delMsg(slack, chan, time));
         	}
 
-            else if (user == slack.getUserByID('U07RLJWDC') && text.startsWith('.say ')) {
+            else if (user == slack.getUserByID('U0E4ZL97H') && text.startsWith('.say ')) {
         		var input = text;
                 var args = input.replace('.say ', '').split(' ');
                 if (args[0].startsWith('<') && args[0].endsWith('>') && args.length > 1) {

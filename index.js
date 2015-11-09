@@ -113,7 +113,7 @@ slack.on('message', function(message){
         }
 
         // Earthquake Debugging
-		else if (text == '.quakepls' && user == slack.getUserByID('U07RLJWDC')) {
+		else if (text == '.quakepls' && user == slack.getUserByID('U0E4ZL97H')) {
             quake.run(slack, '{"type":"0","drill":false,"announce_time":"2015/10/24 13:27:37","earthquake_time":"2015/10/24 13:26:35","earthquake_id":"20151024132650","situation":"1","revision":"3","latitude":"42.8","longitude":"143.2","depth":"110km","epicenter_en":"Central Tokachi Subprefecture","epicenter_ja":"十勝地方中部","magnitude":"3.7","seismic_en":"2","seismic_ja":"2","geography":"land","alarm":"0"}');
 			core.delMsg(slack, chan, time);
 		}
