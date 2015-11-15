@@ -24,7 +24,7 @@ exports.run = function(slack, input){
 			'fallback': 'Earthquake - ' + data.epicenter_en + ', Magnitude ' + data.magnitude,
 			'text': 'Epicenter: ' + data.epicenter_en + '\nMagnitude: ' + data.magnitude + ', Seismic: ' + data.seismic_en + ', Depth: ' + data.depth,
 			'title': 'Update ' + situation_string,
-			'image_url': 'https://maps.googleapis.com/maps/api/staticmap?center=' + data.latitude + ',' + data.longitude + '&zoom=6&size=400x300&format=png&markers=' + data.latitude + ',' + data.longitude + '&maptype=roadmap&style=feature:landscape.natural.terrain|hue:0x00ff09|visibility:off&style=feature:water|saturation:-100|lightness:-79&style=feature:transit.line|visibility:off&style=feature:road.highway|visibility:simplified&style=feature:poi|visibility:off&style=feature:administrative.country|visibility:off&style=feature:road|visibility:off'
+			'image_url': 'https://maps.googleapis.com/maps/api/staticmap?center=' + data.latitude + ',' + data.longitude + '&zoom=6&size=400x300&format=png&markers=' + data.latitude + ',' + data.longitude + '&maptype=roadmap&style=feature:landscape.natural.terrain|hue:0x00ff09|visibility:off&style=feature:transit.line|visibility:off&style=feature:road.highway|visibility:simplified&style=feature:poi|visibility:off&style=feature:administrative.country|visibility:off&style=feature:road|visibility:off'
 		}];
 	}
 
