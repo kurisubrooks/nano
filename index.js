@@ -89,9 +89,10 @@ var storedxml = [];
 request('http://www.rfs.nsw.gov.au/feeds/major-Fire-Updates.xml').pipe(parser);
 
 parser.on('item', function(xml) {
-    if (xml === storedxml) return;
+    if (storedxml.length === 0) storedxml.push(xml);
+    else if (xml === storedxml) return;
     else {
-        storedxml.push(xml);
+        storedxml = xml;
 
         var attachments = [{
             'color': core.error,
