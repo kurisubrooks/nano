@@ -2,7 +2,7 @@ var YQL = require('yql');
 var keys = require('../keys');
 var core = require('./core');
 
-exports.run = function(slack, text, time, chan, channel, user){
+exports.current = function(slack, text, time, chan, channel, user){
 	try {
 		var weather_out = text.replace('.weather ', '');
 		var query = new YQL('select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="' + weather_out + '") and u="c"');
@@ -15,36 +15,22 @@ exports.run = function(slack, text, time, chan, channel, user){
 					var weather = data.query.results.channel;
 					var location = data.query.results.channel.location;
 					var condition = data.query.results.channel.item.condition;
-					var forecast = data.query.results.channel.item.forecast;
 
-					var forecast_text = '';
-					var weather_pressure = '';
-					for (var i = 0; i < 5; i++) {
-						forecast_text += emoji_type(forecast[i].code) + ' *' + forecast[i].day + '*, ' + forecast[i].date + '\n' +
-						forecast[i].text + ', Min: ' + forecast[i].low + 'º' + weather.units.temperature + ', Max: ' + forecast[i].high + 'º' + weather.units.temperature + '\n\n';
-					}
-
-					if (weather.atmosphere.pressure === '') weather_pressure = 'Unknown';
-					else weather_pressure = weather.atmosphere.pressure + weather.units.pressure;
-
-					var weatherAttach = [{
+					var attachments = [{
 						'color': core.info,
 						'fallback': 'Here\'s the weather for ' + location.city + '.',
-						'title': emoji_type(condition.code) + ' ' + location.city + ', ' + location.country,
+						'title': emoji_type(condition.code) + ' ' + location.city + ', ' + location.region + ' ' + location.country,
 						'mrkdwn_in': ['text'],
 						'text':
-							'*Temperature*: ' + condition.temp + 'º' + weather.units.temperature + '\n' +
-							'*Condition*: ' + condition.text + '\n' +
+							'*Temperature:* ' + condition.temp + 'º\n' +
 							'*Humidity*: ' + weather.atmosphere.humidity + '%\n' +
-							'*Wind Speed*: ' + weather.wind.speed + weather.units.speed + '\n' +
-							'*Pressure*: ' + weather_pressure + '\n\n' +
-							'*Weekly Forecast*: \n' + forecast_text
+							'*Wind Speed*: ' + weather.wind.speed + weather.units.speed
 					}];
 
 					slack._apiCall('chat.postMessage', {
 						'as_user': true,
 						'channel': chan,
-						'attachments': JSON.stringify(weatherAttach)
+						'attachments': JSON.stringify(attachments)
 					}, core.delMsg(slack, chan, time));
 				}
 			}
@@ -54,7 +40,49 @@ exports.run = function(slack, text, time, chan, channel, user){
 	catch (error){
 		channel.send(core.errno + '```' + error + '```');
 	}
+};
 
+exports.forecast = function(slack, text, time, chan, channel, user){
+	try {
+		var weather_out = text.replace('.forecast ', '');
+		var query = new YQL('select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="' + weather_out + '") and u="c"');
+
+		query.exec(function(error, data) {
+			if (error) channel.send(core.errno + '```' + error + '```');
+			else {
+				if (data.query.results === null) channel.send('*Error*: Your query returned no results.');
+				else if (data.query.results !== null) {
+					var condition = data.query.results.channel.item.condition;
+					var location = data.query.results.channel.location;
+					var forecast = data.query.results.channel.item.forecast;
+					var forecast_text = '';
+
+					for (var i = 0; i < 5; i++) {
+						forecast_text += '*' + forecast[i].day + '*, ' + forecast[i].date + '\n' +
+						forecast[i].text + ', Min: ' + forecast[i].low + 'º, Max: ' + forecast[i].high + 'º' + '\n\n';
+					}
+
+					var attachments = [{
+						'color': core.info,
+						'fallback': 'Here\'s the forecast for ' + location.city + '.',
+						'title': emoji_type(condition.code) + ' ' + location.city + ', ' + location.region + ' ' + location.country,
+						'mrkdwn_in': ['text'],
+						'text': forecast_text
+					}];
+
+					slack._apiCall('chat.postMessage', {
+						'as_user': true,
+						'channel': chan,
+						'attachments': JSON.stringify(attachments)
+					}, core.delMsg(slack, chan, time));
+				}
+			}
+		});
+	}
+
+	catch (error){
+		channel.send(core.errno + '```' + error + '```');
+	}
 };
 
 function emoji_type(code) {
@@ -107,6 +135,6 @@ function emoji_type(code) {
 	else if (code == '45')	return ':zap: :umbrella:';
 	else if (code == '46')	return ':snowflake: :umbrella:';
 	else if (code == '47')	return ':zap: :cloud:';
-	else if (code == '3200')return ':question:';
+	else if (code == '3200')return ':partly_sunny:';
 	else return ':question:';
 }
