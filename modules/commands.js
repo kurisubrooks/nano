@@ -76,9 +76,9 @@ exports.run = function(slack, text, time, chan, channel, user){
 	        			'pretext': 'I can do the following:',
 	        			'mrkdwn_in': ['text'],
 	        			'text': '`.search  %s` – Search the Internet \n' +
-	        					'`.weather %s` – Gets the Weather \n' +
-	        					'`.gifs` – Lists all available gifs \n\n' +
-	        					'Wanna translate some text? Ask my itoko, <@rioka>!'
+	        					'`.weather %s` – Gets the Current Weather \n' +
+                                '`.forecast %s` – Gets the Weather Forecast \n' +
+	        					'`.gifs` – Lists all available gifs'
 	        		}])
         		}, core.delMsg(slack, chan, time));
         	}
