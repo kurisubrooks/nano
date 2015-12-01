@@ -7,7 +7,7 @@ exports.run = function(slack, text, time, chan, channel, user){
             'as_user': true,
             'channel': chan,
             'attachments': JSON.stringify([{
-	            'fallback': 'Here\'s something to annoy Paul with:',
+	            'fallback': '<gif>',
 	            'image_url': url
 	        }])
         });
@@ -53,7 +53,7 @@ exports.run = function(slack, text, time, chan, channel, user){
 				core.delMsg(slack, chan, time);
             }
 
-            else if (user == slack.getUserByID('U0E4ZL97H') && text == '.exit') {
+            else if (user == slack.getUserByID(core.kurisu) && text == '.exit') {
         		slack._apiCall('chat.postMessage', {
         			'as_user': true,
         			'channel': chan,
@@ -63,7 +63,7 @@ exports.run = function(slack, text, time, chan, channel, user){
 	        		}])
         		}, function(){
                     core.delMsg(slack, chan, time);
-        			process.exit(0);
+        			setTimeout(function(){process.exit(0);}, 2000);
         		});
         	}
 
