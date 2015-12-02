@@ -81,38 +81,55 @@ socket.on('disconnect', function(){
 });
 
 // NSW RFS Alerts Feed
-var FeedMe = require('feedme');
-var request = require('request');
-var parser = new FeedMe();
+var fs = require('fs'),
+    xml2js = require('xml2js'),
+    parser = new xml2js.Parser(),
+    request = require('request');
+
 var storedxml = [];
-
-request('http://www.rfs.nsw.gov.au/feeds/major-Fire-Updates.xml').pipe(parser);
-
-parser.on('item', function(xml) {
-    if (storedxml.length === 0) storedxml.push(xml);
-    else if (xml === storedxml) return;
-    else {
-        storedxml = xml;
-
-        var attachments = [{
-            'color': core.error,
-            'mrkdwn_in': ['text'],
-            'fallback': 'A NSW Fire Alert has been issued!',
-            'title': ':fire: NSW Fire Alert',
-            'text': '*' + xml.title + '*\n' + xml.description
-        }];
-
-        slack._apiCall('chat.postMessage', {
-            as_user: true,
-            channel: '#general',
-            attachments: JSON.stringify(attachments)
-        });
-    }
-});
+getxml();
 
 setInterval(function(){
-    request('http://www.rfs.nsw.gov.au/feeds/major-Fire-Updates.xml').pipe(parser);
+    getxml();
 }, 120000);
+
+function getxml() {
+    /*fs.readFile(__dirname + '/test.xml', function(err, data){
+        parser.parseString(data, function(err, result){ });
+    });*/
+
+    request('http://www.rfs.nsw.gov.au/feeds/major-Fire-Updates.xml', function(error,response,output){
+        if (!error && response.statusCode == 200) {
+            parser.parseString(output, function(err, result){
+                // If Cache is empty, fill with result xml
+                if (storedxml.length === 0) storedxml = result;
+
+                // If Cache is the same as the retrieved XML
+                else if (storedxml.rss.channel[0].item[0].description[0] == result.rss.channel[0].item[0].description[0] && storedxml.rss.channel[0].item[0].title[0] == result.rss.channel[0].item[0].title[0]) return;
+
+                // If Cache is different to retrieved XML
+                else {
+                    // Store the new XML
+                    storedxml = result;
+
+                    var attachments = [{
+                        'color': core.error,
+                        'mrkdwn_in': ['text'],
+                        'fallback': 'A NSW Fire Alert has been issued!',
+                        'title': ':fire: NSW Fire Alert',
+                        'text': '*' + result.rss.channel[0].item[0].title[0] + '*\n' + result.rss.channel[0].item[0].description[0] + '\n' + 'http://www.rfs.nsw.gov.au/fire-information/fires-near-me'
+                    }];
+
+                    slack._apiCall('chat.postMessage', {
+                        as_user: true,
+                        channel: '#general',
+                        attachments: JSON.stringify(attachments)
+                    });
+                }
+            });
+        }
+    });
+}
 
 // Parse Slack Messages
 slack.on('message', function(message){
