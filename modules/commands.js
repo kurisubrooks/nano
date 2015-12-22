@@ -1,5 +1,5 @@
-var core = require('./core');
-var logger = require('lumios-toolkit');
+const core = require('./core');
+const logger = require('crimson');
 
 exports.run = function(slack, text, time, chan, channel, user){
     function gif(url) {
@@ -13,40 +13,53 @@ exports.run = function(slack, text, time, chan, channel, user){
         });
     }
 
-    function checkText(input) {
+    function cheque(input) {
 		if (input == text) core.delMsg(slack, chan, time);
         return text == input || text.contains(' ' + input);
     }
 
     try {
     	if (user != slack.getUserByID('U0E4WJNTX')) {
-    		if      (checkText('.shrug'))   channel.send('¯\\_(ツ)_/¯');
-    		else if (checkText('.kawaii'))  channel.send('(ﾉ◕ヮ◕)ﾉ*:・ﾟ✧');
-    		else if (checkText('.flip'))	channel.send('(╯°□°）╯︵ ┻━┻)');
-    		else if (checkText('.lenny'))	channel.send('( ͡° ͜ʖ ͡°)');
-    		else if (checkText('.cries'))	channel.send('(;´∩`;)');
-    		else if (checkText('.nbc'))	    channel.send(':stars: *NBC*\n_the more you know_');
-    		else if (checkText('.close'))	channel.send('You were so close...');
-    		else if (checkText('.magic'))	channel.send(':magic:');
+    		if      (cheque('.shrug'))   channel.send('¯\\_(ツ)_/¯');
+    		else if (cheque('.kawaii'))  channel.send('(ﾉ◕ヮ◕)ﾉ*:・ﾟ✧');
+    		else if (cheque('.flip'))	 channel.send('(╯°□°）╯︵ ┻━┻)');
+    		else if (cheque('.lenny'))	 channel.send('( ͡° ͜ʖ ͡°)');
+    		else if (cheque('.cries'))	 channel.send('(;´∩`;)');
+    		else if (cheque('.nbc'))	 channel.send(':stars: *NBC*\n_the more you know_');
+    		else if (cheque('.close'))	 channel.send('You were so close...');
+    		else if (cheque('.magic'))	 channel.send(':magic:');
 
-            else if (checkText('.facepalm'))gif('https://media.giphy.com/media/8BYLSNmnJYQxy/giphy.gif');
-            else if (checkText('.mindblown'))gif('https://media.giphy.com/media/oXp54qyqKGzzG/giphy.gif');
-            else if (checkText('.pantsu'))  gif('https://media.giphy.com/media/79kGG4pjwlFh6/giphy.gif');
-            else if (checkText('.no'))		gif('https://media0.giphy.com/media/XMl7bkguaL4PK/200.gif');
-            else if (checkText('.nya'))	    gif('https://thecatapi.com/api/images/get?format=src&type=gif');
-            else if (checkText('.crash'))	gif('http://i.imgur.com/kiKRmYY.gif');
-            else if (checkText('.joke'))	gif('http://i.imgur.com/v4NsQhC.gif');
-            else if (checkText('.baka'))    gif('https://media.giphy.com/media/bOCMPVgsVnRT2/giphy.gif');
-            else if (checkText('.idiot'))	gif('http://i.imgur.com/XUbzeIA.gif');
-            else if (checkText('.wat'))	    gif('http://i.imgur.com/QB9lziN.gif');
-            else if (checkText('.cri'))	    gif('http://i.imgur.com/ZVeCD53.gif');
-            else if (checkText('.clap'))	gif('http://i.imgur.com/cxPP56N.gif');
-            else if (checkText('.sleep'))   gif('http://i.imgur.com/NP0JjB0.gif');
-            else if (checkText('.deal'))	gif('https://media.giphy.com/media/cQwaKZ3oNqptm/giphy.gif');
-            else if (checkText('.uso'))	    gif('http://1.bp.blogspot.com/-7aBesvnS7BM/Uo52S9PQSFI/AAAAAAAAPEg/WfQHOkmoi00/s1600/you-liar.gif');
-            else if (checkText('.wow'))	    gif('http://i1.kym-cdn.com/photos/images/facebook/000/612/917/02d.gif');
-            else if (checkText('.soon'))	gif('http://1.bp.blogspot.com/-yRKdiyePiCI/U7Lp4r1J9VI/AAAAAAAABdU/zKIdHlpfODU/s1600/soon+cat.gif');
-            else if (checkText('.fuck'))	gif('https://38.media.tumblr.com/4ae724664b736d537d86dbb484a7f703/tumblr_n5t3ioGkeP1sdac4wo1_400.gif');
+            else if (cheque('.facepalm'))gif('https://media.giphy.com/media/8BYLSNmnJYQxy/giphy.gif');
+            else if (cheque('.mindblown'))gif('https://media.giphy.com/media/oXp54qyqKGzzG/giphy.gif');
+            else if (cheque('.pantsu'))  gif('https://media.giphy.com/media/79kGG4pjwlFh6/giphy.gif');
+            else if (cheque('.no'))		 gif('https://media0.giphy.com/media/XMl7bkguaL4PK/200.gif');
+            else if (cheque('.nya'))	 gif('https://thecatapi.com/api/images/get?format=src&type=gif');
+            else if (cheque('.crash'))	 gif('http://i.imgur.com/kiKRmYY.gif');
+            else if (cheque('.joke'))	 gif('http://i.imgur.com/v4NsQhC.gif');
+            else if (cheque('.baka'))    gif('https://media.giphy.com/media/bOCMPVgsVnRT2/giphy.gif');
+            else if (cheque('.idiot'))	 gif('http://i.imgur.com/XUbzeIA.gif');
+            else if (cheque('.wat'))	 gif('http://i.imgur.com/QB9lziN.gif');
+            else if (cheque('.cri'))	 gif('http://i.imgur.com/ZVeCD53.gif');
+            else if (cheque('.clap'))	 gif('http://i.imgur.com/cxPP56N.gif');
+            else if (cheque('.sleep'))   gif('http://i.imgur.com/NP0JjB0.gif');
+            else if (cheque('.deal'))	 gif('https://media.giphy.com/media/cQwaKZ3oNqptm/giphy.gif');
+            else if (cheque('.uso'))	 gif('http://i.imgur.com/fCxDtYy.gif');
+            else if (cheque('.wow'))	 gif('http://i1.kym-cdn.com/photos/images/facebook/000/612/917/02d.gif');
+            else if (cheque('.soon'))	 gif('http://1.bp.blogspot.com/-yRKdiyePiCI/U7Lp4r1J9VI/AAAAAAAABdU/zKIdHlpfODU/s1600/soon+cat.gif');
+            else if (cheque('.soon1'))    gif('http://i.imgur.com/WRaSz.gif');
+            else if (cheque('.fuck'))	 gif('http://i.imgur.com/HIDfKjd.gif');
+            else if (cheque('.rekt'))    gif('http://i.imgur.com/z5FzTCb.gif');
+            else if (cheque('.rin'))     gif('http://i.imgur.com/ElmaNHm.gif');
+            else if (cheque('.shit'))    gif('http://i.imgur.com/tNgornS.gif');
+            else if (cheque('.pan'))     gif('http://i.imgur.com/p6iCwo3.gif');
+            else if (cheque('.akarin'))  gif('http://i.imgur.com/LnJw5El.gif');
+            else if (cheque('.easy'))    gif('http://i.imgur.com/bEllCUv.gif');
+            else if (cheque('.gg'))      gif('http://i.imgur.com/x8dlKT1.gif');
+            else if (cheque('.tomato'))  gif('http://i.imgur.com/pWuliMj.gif');
+            else if (cheque('.drool'))   gif('http://i.imgur.com/yGIyVCT.gif');
+            else if (cheque('.yuri'))    gif('http://i.imgur.com/ipA20mn.gif');
+            else if (cheque('.kawaii'))  gif('http://i.imgur.com/4fVVG8t.gif');
+            else if (cheque('.oneechan'))gif('http://i.imgur.com/H3KKlHc.gif');
 
             else if (text == '.gifs') {
                 channel.send('`.baka`, `.clap`, `.crash`, `.cri`, `.deal`, `.facepalm`, `.fuck`, `.idiot`, `.joke`, `.mindblown`, `.no`, `.nya`, `.pantsu`, `.sleep`, `.soon`, `.uso`, `.wat`, `.wow`');
