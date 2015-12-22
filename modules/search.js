@@ -1,6 +1,6 @@
-var http = require('https');
-var keys = require('../keys');
-var core = require('./core');
+const http = require('https');
+const keys = require('../keys');
+const core = require('./core');
 
 exports.run = function(slack, text, time, chan, channel, user){
     try {

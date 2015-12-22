@@ -1,5 +1,5 @@
-var core = require('./core');
-var logger = require('lumios-toolkit');
+const core = require('./core');
+const logger = require('crimson');
 
 exports.run = function(slack, input){
 	var data = JSON.parse(input);
@@ -9,6 +9,7 @@ exports.run = function(slack, input){
 	if (data.situation == 1) situation_string = 'Final';
 	else situation_string = '#' + (Number(data.revision) - 1);
 
+    // First
 	if (data.revision == 1) {
 		attachments = [{
 			'color': core.error,
@@ -19,6 +20,7 @@ exports.run = function(slack, input){
 		}];
 	}
 
+    // Final
 	else if (data.situation == 1) {
 		attachments = [{
 			'color': core.error,
@@ -30,6 +32,7 @@ exports.run = function(slack, input){
 		}];
 	}
 
+    // Update
 	else {
 		attachments = [{
 			'color': core.error,
