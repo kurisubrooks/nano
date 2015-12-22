@@ -1,17 +1,20 @@
-var YQL = require('yql');
-var keys = require('../keys');
-var core = require('./core');
+const YQL = require('yql');
+const keys = require('../keys');
+const core = require('./core');
 
-exports.current = function(slack, text, time, chan, channel, user){
+exports.current = function(slack, text, time, chan, channel, user) {
 	try {
-		var weather_out = text.replace('.weather ', '');
+        var input = text.split(' ');
+        if (text[0].indexOf('.w') >= 0) input[0] = '';
+        var weather_out = input.join(' ');
+
 		var query = new YQL('select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="' + weather_out + '") and u="c"');
 
 		query.exec(function(error, data) {
 			if (error) channel.send(core.errno + '```' + error + '```');
 			else {
 				if (data.query.results === null) channel.send('*Error*: Your query returned no results.');
-				else if (data.query.results !== null) {
+				else if (data.query.results != null) {
 					var weather = data.query.results.channel;
 					var location = data.query.results.channel.location;
 					var condition = data.query.results.channel.item.condition;
@@ -24,7 +27,8 @@ exports.current = function(slack, text, time, chan, channel, user){
 						'text':
 							'*Temperature:* ' + condition.temp + 'º\n' +
 							'*Humidity*: ' + weather.atmosphere.humidity + '%\n' +
-							'*Wind Speed*: ' + weather.wind.speed + weather.units.speed
+							'*Wind Speed*: ' + weather.wind.speed + weather.units.speed,
+                        'thumb_url': 'https://ssl.gstatic.com/onebox/weather/256/' + weather_img(condition.code) + '.png'
 					}];
 
 					slack._apiCall('chat.postMessage', {
@@ -42,7 +46,7 @@ exports.current = function(slack, text, time, chan, channel, user){
 	}
 };
 
-exports.forecast = function(slack, text, time, chan, channel, user){
+exports.forecast = function(slack, text, time, chan, channel, user) {
 	try {
 		var weather_out = text.replace('.forecast ', '');
 		var query = new YQL('select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="' + weather_out + '") and u="c"');
@@ -51,7 +55,7 @@ exports.forecast = function(slack, text, time, chan, channel, user){
 			if (error) channel.send(core.errno + '```' + error + '```');
 			else {
 				if (data.query.results === null) channel.send('*Error*: Your query returned no results.');
-				else if (data.query.results !== null) {
+				else if (data.query.results != null) {
 					var condition = data.query.results.channel.item.condition;
 					var location = data.query.results.channel.location;
 					var forecast = data.query.results.channel.item.forecast;
@@ -84,6 +88,34 @@ exports.forecast = function(slack, text, time, chan, channel, user){
 		channel.send(core.errno + '```' + error + '```');
 	}
 };
+
+function weather_img(code) {
+    if (code == '0' || code == '1' || code == '2') {
+        return 'windy';
+    } else if (code == '3' || code == '4' || code == '37' || code == '38' || code == '39' || code == '45' || code == '47') {
+        return 'thunderstorms';
+    } else if (code == '5' || code == '6' || code == '7' || code == '35') {
+        return 'snow_s_rain';
+    } else if (code == '8' || code == '9' || code == '10' || code == '11' || code == '12') {
+        return 'rain_light';
+    } else if (code == '13' || code == '14' || code == '15') {
+        return 'snow_light';
+    } else if (code == '16' || code == '17' || code == '18' || code == '41' || code == '42' || code == '43' || code == '46') {
+        return 'snow';
+    } else if (code == '19' || code == '20' || code == '21' || code == '22' || code == '23') {
+        return 'fog';
+    } else if (code == '24') {
+        return 'windy';
+    } else if (code == '25' || code == '26') {
+        return 'cloudy';
+    } else if (code == '27' || code == '28' || code == '29' || code == '30' || code == '44' || code == '3200') {
+        return 'partly_cloudy';
+    } else if (code == '31' || code == '32' || code == '33' || code == '34' || code == '36') {
+        return 'sunny';
+    } else if (code == '40') {
+        return 'rain';
+    }
+}
 
 function emoji_type(code) {
 	// https://developer.yahoo.com/weather/documentation.html
