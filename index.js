@@ -3,13 +3,48 @@ const Slack = require("slack-client");
 const _ = require("lodash");
 const path = require("path");
 const util = require("util");
-const core = require(path.join(__dirname, "core.js"));
 const crimson = require("crimson");
+const core = require(path.join(__dirname, "core.js"));
 const keychain = require(path.join(__dirname, "keychain.js"));
+
+
+// Shake
+const shake = require("socket.io-client")(keychain.shake);
+
+function shake_general(text) {
+    slack._apiCall("chat.postMessage", {
+        as_user: true,
+        channel: "#general",
+        text: text
+    });
+}
+
+shake.on("connect", () => {
+    crimson.success("Connected to Shake.");
+    if (!config.debug) return;
+    shake_general("Connected to Shake.");
+});
+
+shake.on("data", data => {
+    require(path.join(__dirname, "quake.js")).run(slack, data);
+});
+
+shake.on("reconnect", () => {
+    crimson.warn("Connection to Shake was lost, reconnecting...");
+    shake_general("*Notice*: Connection to Shake was lost, reconnecting...");
+});
+
+shake.on("disconnect", () => {
+    crimson.error("Connection to Shake was lost!");
+    shake_general("*Error*: Connection to Shake was lost!");
+});
+
+// Implements crimson Fatal error.
+crimson.fatalerror = (text) => { crimson.error("[FATAL] " + text); process.exit(1); };
 
 // Debug mode.
 var debug = false;
-crimson.nicedebug = (text) => { if(debug) crimson.debug(text); };
+crimson.nicedebug = (text) => { if (debug) crimson.debug(text); };
 
 const wrongType = (part, command, key) => crimson.fatal("Incorrect type for " + part + " in command " + command + " at key " + key + ".");
 
@@ -24,6 +59,7 @@ try {
     _.each(commands, (command, key) => {
         if (typeof command.command !== "string") crimson.fatal("Missing command name ['command'] at key " + key + ".");
         if (typeof command.desc !== "string") wrongType("description ['desc']", command.command, key);
+        if (!(config.masters instanceof Array)) wrongType("masters ['masters']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("alias ['alias']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("arguments ['args']", command.command, key);
         _.each(command.alias, (v) => { if (typeof v !== "string") wrongType("alias ['alias']", command.command, key); });
@@ -145,7 +181,7 @@ slack.on("message", (data) => {
             // If supported arguments count don't match argument count, do not continue.
             if (matched.args.length !== 0 && supportedArgs.indexOf(args) === -1) return;
             // Runs command.
-            var others = {config: config, command: originalCommand};
+            var others = {config: config, command: originalCommand, masters: config.masters};
             var module = require(path.join(__dirname, "commands", command + ".js"));
             module.main(slack, channel, user, text, ts, others);
 
@@ -154,5 +190,7 @@ slack.on("message", (data) => {
         }
     }
 });
+
+
 
 slack.login();
