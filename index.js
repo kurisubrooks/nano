@@ -90,7 +90,7 @@ slack.on("message", (data) => {
             // Send reaction.
             channel.send(config.reacts[part]);
             // If text is equals to part, delete message.
-            if (text === part) core.delMsg(channel.id, ts);
+            if (text === config.sign + part) core.delMsg(channel.id, ts);
             // Sets gif or reacts matched to true.
             matchedReactOrGif = true;
             // Do not continue for gifs.
@@ -109,7 +109,7 @@ slack.on("message", (data) => {
                 }])
             });
             // If text is equals to part, delete message.
-            if (text === part) core.delMsg(channel.id, ts);
+            if (text === config.sign + part) core.delMsg(channel.id, ts);
             // Sets gif or reacts matched to true.
             matchedReactOrGif = true;
         }
@@ -150,7 +150,7 @@ slack.on("message", (data) => {
             module.main(slack, channel, user, text, ts, others);
 
         } catch(e) {
-            channel.send("Failed to run command " + command + ". Here's what Na-nose: ```" + e + "```");
+            channel.send("Failed to run command `" + command + "`. Here's what Na-nose: ```" + e + "```");
         }
     }
 });
