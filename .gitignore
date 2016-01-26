@@ -3,3 +3,4 @@ node_modules
 keys.js
 logs
 test.*
+keychain.js
