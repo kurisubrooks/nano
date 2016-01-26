@@ -1,18 +1,57 @@
 {
-	"sign": "!",
-	"debug": true,
-	"gifs": {
-		"wat": "http://i.imgur.com/QB9lziN.gif"
-	},
-	"reacts": {
-		"wats": "wat."
-	},
-	"commands": [
-		{
-			"command": "test",
-			"alias": ["t"],
-			"desc": "Testing (and usually breaking) things.",
-			"args": []
-		}
-	]
+    "sign": "!",
+    "debug": true,
+    "gifs": {
+        "facepalm": "https://media.giphy.com/media/8BYLSNmnJYQxy/giphy.gif",
+        "pantsu": "https://media.giphy.com/media/79kGG4pjwlFh6/giphy.gif",
+        "no": "https://media0.giphy.com/media/XMl7bkguaL4PK/200.gif",
+        "crash": "http://i.imgur.com/kiKRmYY.gif",
+        "joke": "http://i.imgur.com/v4NsQhC.gif",
+        "baka": "https://media.giphy.com/media/bOCMPVgsVnRT2/giphy.gif",
+        "idiot": "http://i.imgur.com/XUbzeIA.gif",
+        "wat": "http://i.imgur.com/QB9lziN.gif",
+        "cri": "http://i.imgur.com/ZVeCD53.gif",
+        "clap": "http://i.imgur.com/cxPP56N.gif",
+        "sleep": "http://i.imgur.com/NP0JjB0.gif",
+        "deal": "https://media.giphy.com/media/cQwaKZ3oNqptm/giphy.gif",
+        "wow": "https://media.giphy.com/media/NibwQB5CcltuM/giphy.gif",
+        "soon": "http://1.bp.blogspot.com/-yRKdiyePiCI/U7Lp4r1J9VI/AAAAAAAABdU/zKIdHlpfODU/s1600/soon+cat.gif",
+        "fuck": "http://i.imgur.com/HIDfKjd.gif",
+        "rekt": "http://i.imgur.com/z5FzTCb.gif",
+        "rin": "http://i.imgur.com/ElmaNHm.gif",
+        "kuso": "http://i.imgur.com/tNgornS.gif",
+        "pan": "http://i.imgur.com/p6iCwo3.gif",
+        "easy": "http://i.imgur.com/bEllCUv.gif",
+        "gj": "http://i.imgur.com/x8dlKT1.gif",
+        "daisuki": "http://i.imgur.com/H3KKlHc.gif"
+    },
+    "reacts": {
+        "shrug": "¯\\_(ツ)_/¯",
+        "kawaii": "(ﾉ◕ヮ◕)ﾉ*:・ﾟ✧",
+        "flip": "(╯°□°）╯︵ ┻━┻)",
+        "lenny": "( ͡° ͜ʖ ͡°)",
+        "nbc": ":stars: *NBC*\n_the more you know_",
+        "close": "You were so close...",
+        "magic": ":magic:"
+    },
+    "commands": [
+        {
+            "command": "test",
+            "alias": ["t"],
+            "desc": "Testing (and usually breaking) things.",
+            "args": []
+        },
+        {
+            "command": "weather",
+            "alias": ["w"],
+            "desc": "Get the Weather for the given Location",
+            "args": []
+        },
+        {
+            "command": "exit",
+            "alias": ["crash"],
+            "desc": "Unplugs the Power",
+            "args": []
+        }
+    ]
 }
