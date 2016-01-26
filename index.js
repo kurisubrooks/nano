@@ -45,18 +45,18 @@ crimson.fatalerror = (text) => { crimson.error("[FATAL] " + text); process.exit(
 var debug = false;
 crimson.nicedebug = (text) => { if(debug) crimson.debug(text); };
 
-const wrongType = (part, command, key) => crimson.fatalerror("Incorrect type for " + part + " in command " + command + " at key " + key + ".");
+const wrongType = (part, command, key) => crimson.fatal("Incorrect type for " + part + " in command " + command + " at key " + key + ".");
 
 // Try to load config files.
 try {
     // Define config and bot.
     const config = require(path.join(__dirname, "config.json"));
-    if (typeof config.sign !== "string" || typeof config.debug !== "boolean") crimson.fatalerror("Configuration of 'sign' and/or 'debug' is incorrect.");
+    if (typeof config.sign !== "string" || typeof config.debug !== "boolean") crimson.fatal("Configuration of 'sign' and/or 'debug' is incorrect.");
     const commands = config.commands;
-    if (!(commands instanceof Array)) crimson.fatalerror("Section `commands` should be an array.");
+    if (!(commands instanceof Array)) crimson.fatal("Section `commands` should be an array.");
 
     _.each(commands, (command, key) => {
-        if (typeof command.command !== "string") crimson.fatalerror("Missing command name ['command'] at key " + key + ".");
+        if (typeof command.command !== "string") crimson.fatal("Missing command name ['command'] at key " + key + ".");
         if (typeof command.desc !== "string") wrongType("description ['desc']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("alias ['alias']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("arguments ['args']", command.command, key);
@@ -66,10 +66,10 @@ try {
 
 } catch(e) {
     crimson.error("Failed to start. Either config.json is not present, corrupted or missing arguments.");
-    crimson.fatalerror("Error: " + e);
+    crimson.fatal("Error: " + e);
 }
 
-// Initiating Slack and it's functions.
+// Initialise Slack and it's functions.
 const slack = new Slack(keychain.slack, true, true);
 
 // This fires when the client has authenticated with Slack servers.
@@ -88,7 +88,7 @@ slack.on("open", () => crimson.nicedebug("Chat has been opened, and messages can
 slack.on("close", () => crimson.warn("Disconnected from Slack."));
 
 // Noooooo!
-slack.on("error", () => crimson.fatalerror("A Slack error has occured: " + util.inspect(error)));
+slack.on("error", () => crimson.fatal("A Slack error has occured: " + util.inspect(error)));
 
 slack.on("message", (data) => {
     // Do not continue if sender is self, or is not a message or a me_message.
@@ -115,16 +115,16 @@ slack.on("message", (data) => {
     // Foreach every part of the text.
     _.each(text.split(" "), (part) => {
         // If the parts start with the sign, remove the sign and continue, otherwose do not continue.
-        if(part.startsWith(config.sign)) part = part.slice(config.sign.length).toLowerCase();
+        if (part.startsWith(config.sign)) part = part.slice(config.sign.length).toLowerCase();
         else return;
 
         // Reacts.
         // If part exists in Reacts object.
-        if(typeof config.reacts[part] === "string") {
+        if (typeof config.reacts[part] === "string") {
             // Send reaction.
             channel.send(config.reacts[part]);
             // If text is equals to part, delete message.
-            if(text === part) core.delMsg(channel.id, ts);
+            if (text === part) core.delMsg(channel.id, ts);
             // Sets gif or reacts matched to true.
             matchedReactOrGif = true;
             // Do not continue for gifs.
@@ -132,7 +132,7 @@ slack.on("message", (data) => {
         }
 
         // Gifs.
-        if(typeof config.gifs[part] === "string") {
+        if (typeof config.gifs[part] === "string") {
             // Send Gif.
             slack._apiCall("chat.postMessage", {
                 "as_user": true,
@@ -143,13 +143,13 @@ slack.on("message", (data) => {
                 }])
             });
             // If text is equals to part, delete message.
-            if(text === part) core.delMsg(channel.id, ts);
+            if (text === part) core.delMsg(channel.id, ts);
             // Sets gif or reacts matched to true.
             matchedReactOrGif = true;
         }
     });
 
-    if(matchedReactOrGif) return;
+    if (matchedReactOrGif) return;
 
     // Begin command checks.
     if (text.startsWith(config.sign) || im) {
@@ -184,7 +184,7 @@ slack.on("message", (data) => {
             module.main(slack, channel, user, text, ts, others);
 
         } catch(e) {
-            channel.send("Failed to run command " + command + ". Here's what nano-es: ```" + e + "```");
+            channel.send("Failed to run command " + command + ". Here's what Na-nose: ```" + e + "```");
         }
     }
 });
