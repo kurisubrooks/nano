@@ -1,6 +1,6 @@
 {
     "sign": "!",
-    "debug": true,
+    "debug": false,
     "masters": ["U0E56N7UK", "U0E4ZL97H"],
     "gifs": {
         "facepalm": "https://media.giphy.com/media/8BYLSNmnJYQxy/giphy.gif",
@@ -45,13 +45,25 @@
         {
             "command": "weather",
             "alias": ["w"],
-            "desc": "Get the Weather for the given Location",
+            "desc": "Get the Current Weather",
+            "args": []
+        },
+        {
+            "command": "forecast",
+            "alias": ["f"],
+            "desc": "Get the Weather Forecast",
+            "args": []
+        },
+        {
+            "command": "search",
+            "alias": ["s"],
+            "desc": "Search Google",
             "args": []
         },
         {
             "command": "exit",
-            "alias": ["crash"],
-            "desc": "Unplugs the Power",
+            "alias": ["gtfo"],
+            "desc": "Unplug the Power",
             "args": []
         }
     ]
