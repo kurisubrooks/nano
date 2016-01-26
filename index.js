@@ -45,7 +45,7 @@ crimson.fatalerror = (text) => { crimson.error("[FATAL] " + text); process.exit(
 
 // Debug mode.
 var debug = false;
-crimson.nicedebug = (text) => { if(debug) crimson.debug(text); };
+crimson.nicedebug = (text) => { if (debug) crimson.debug(text); };
 
 const wrongType = (part, command, key) => crimson.fatal("Incorrect type for " + part + " in command " + command + " at key " + key + ".");
 
@@ -60,6 +60,7 @@ try {
     _.each(commands, (command, key) => {
         if (typeof command.command !== "string") crimson.fatal("Missing command name ['command'] at key " + key + ".");
         if (typeof command.desc !== "string") wrongType("description ['desc']", command.command, key);
+        if (!(config.masters instanceof Array)) wrongType("masters ['masters']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("alias ['alias']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("arguments ['args']", command.command, key);
         _.each(command.alias, (v) => { if (typeof v !== "string") wrongType("alias ['alias']", command.command, key); });
@@ -161,7 +162,7 @@ slack.on("message", (data) => {
         command = args.splice(0, 1)[0].toLowerCase();
         if (command.startsWith(config.sign)) command = command.slice(config.sign.length);
 
-        if(command === "quake") {
+        if (command === "quake") {
             quake.run(slack, '{"type":"0","drill":false,"announce_time":"2015/10/24 13:27:37","earthquake_time":"2015/10/24 13:26:35","earthquake_id":"20151024132650","situation":"0","revision":"1","latitude":"42.8","longitude":"143.2","depth":"110km","epicenter_en":"Central Tokachi Subprefecture","epicenter_ja":"十勝地方中部","magnitude":"3.7","seismic_en":"2","seismic_ja":"2","geography":"land","alarm":"0"}');
 
             setTimeout(function() {
@@ -194,7 +195,7 @@ slack.on("message", (data) => {
             // If supported arguments count don't match argument count, do not continue.
             if (matched.args.length !== 0 && supportedArgs.indexOf(args) === -1) return;
             // Runs command.
-            var others = {config: config, command: originalCommand};
+            var others = {config: config, command: originalCommand, masters: config.masters};
             var module = require(path.join(__dirname, "commands", command + ".js"));
             module.main(slack, channel, user, text, ts, others);
 
