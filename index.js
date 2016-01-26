@@ -3,9 +3,11 @@ const Slack = require("slack-client");
 const _ = require("lodash");
 const path = require("path");
 const util = require("util");
-const core = require(path.join(__dirname, "core.js"));
 const crimson = require("crimson");
+const core = require(path.join(__dirname, "core.js"));
+const quake = require(path.join(__dirname, "quake.js"));
 const keychain = require(path.join(__dirname, "keychain.js"));
+
 
 // Shake
 const shake = require("socket.io-client")(keychain.shake);
@@ -20,12 +22,12 @@ function shake_general(text) {
 
 shake.on("connect", () => {
     crimson.success("Connected to Shake.");
-    if(!config.debug) return;
+    if (!config.debug) return;
     shake_general("Connected to Shake.");
 });
 
 shake.on("data", data => {
-
+    require(path.join(__dirname, "quake.js")).run(slack, data);
 });
 
 shake.on("reconnect", () => {
@@ -143,7 +145,7 @@ slack.on("message", (data) => {
                 }])
             });
             // If text is equals to part, delete message.
-            if (text === part) core.delMsg(channel.id, ts);
+            if (text === config.sign + part) core.delMsg(channel.id, ts);
             // Sets gif or reacts matched to true.
             matchedReactOrGif = true;
         }
@@ -158,6 +160,19 @@ slack.on("message", (data) => {
         // Define raw command, without command sign sliced.
         command = args.splice(0, 1)[0].toLowerCase();
         if (command.startsWith(config.sign)) command = command.slice(config.sign.length);
+
+        if(command === "quake") {
+            quake.run(slack, '{"type":"0","drill":false,"announce_time":"2015/10/24 13:27:37","earthquake_time":"2015/10/24 13:26:35","earthquake_id":"20151024132650","situation":"0","revision":"1","latitude":"42.8","longitude":"143.2","depth":"110km","epicenter_en":"Central Tokachi Subprefecture","epicenter_ja":"十勝地方中部","magnitude":"3.7","seismic_en":"2","seismic_ja":"2","geography":"land","alarm":"0"}');
+
+            setTimeout(function() {
+                quake.run(slack, '{"type":"0","drill":false,"announce_time":"2015/10/24 13:27:37","earthquake_time":"2015/10/24 13:26:35","earthquake_id":"20151024132650","situation":"0","revision":"2","latitude":"42.8","longitude":"143.2","depth":"110km","epicenter_en":"Central Tokachi Subprefecture","epicenter_ja":"十勝地方中部","magnitude":"3.7","seismic_en":"2","seismic_ja":"2","geography":"land","alarm":"0"}');
+            }, 2000);
+
+            setTimeout(function() {
+                quake.run(slack, '{"type":"0","drill":false,"announce_time":"2015/10/24 13:27:37","earthquake_time":"2015/10/24 13:26:35","earthquake_id":"20151024132650","situation":"1","revision":"3","latitude":"42.8","longitude":"143.2","depth":"110km","epicenter_en":"Central Tokachi Subprefecture","epicenter_ja":"十勝地方中部","magnitude":"3.7","seismic_en":"2","seismic_ja":"2","geography":"land","alarm":"0"}');
+            }, 4000);
+            return;
+        }
 
         try {
             // Matches alias from command, to get original command.
