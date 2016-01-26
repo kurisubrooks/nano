@@ -9,6 +9,7 @@ exports.warn = '#F5AD1E';
 exports.info = '#52B7D6';
 exports.debug = false;
 exports.kurisu = 'U0E4ZL97H';
+exports.errno = '*Nano.app has stopped working!* ';
 
 exports.delMsg = function(channel, timestamp) {
     request.post("https://slack.com/api/chat.delete", {form: {token: keychain.user, ts: timestamp, channel: channel}}, (error, response, body) => {
