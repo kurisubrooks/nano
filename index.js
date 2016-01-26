@@ -1,14 +1,12 @@
-// Defining things that should never be changed throughout runtime.
 const Slack = require("slack-client");
 const _ = require("lodash");
 const path = require("path");
 const util = require("util");
 const crimson = require("crimson");
+
 const core = require(path.join(__dirname, "core.js"));
 const keychain = require(path.join(__dirname, "keychain.js"));
-
-
-// Shake
+const quake = require(path.join(__dirname, "quake.js"));
 const shake = require("socket.io-client")(keychain.shake);
 
 function shake_general(text) {
@@ -25,9 +23,8 @@ shake.on("connect", () => {
     shake_general("Connected to Shake.");
 });
 
-shake.on("data", data => {
-    require(path.join(__dirname, "quake.js")).run(slack, data);
-});
+shake.on("data", data => 
+    quake.run(slack, data));
 
 shake.on("reconnect", () => {
     crimson.warn("Connection to Shake was lost, reconnecting...");
@@ -38,9 +35,6 @@ shake.on("disconnect", () => {
     crimson.error("Connection to Shake was lost!");
     shake_general("*Error*: Connection to Shake was lost!");
 });
-
-// Implements crimson Fatal error.
-crimson.fatalerror = (text) => { crimson.error("[FATAL] " + text); process.exit(1); };
 
 // Debug mode.
 var debug = false;
@@ -72,7 +66,7 @@ try {
 }
 
 // Initialise Slack and it's functions.
-const slack = new Slack(keychain.slack, true, true);
+var slack = new Slack(keychain.slack, true, true);
 
 // This fires when the client has authenticated with Slack servers.
 slack.on("loggedIn", (user, team) => {
