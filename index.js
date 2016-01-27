@@ -26,7 +26,7 @@ try {
         if (!(config.masters instanceof Array)) wrongType("masters ['masters']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("alias ['alias']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("arguments ['args']", command.command, key);
-        _.each(config.subprocesses, (v, key) => { if (typeof v !== "string") wrongType("subprocess ['subprocess']", "subprocesses", key); if(v.startsWith(config.sign)) crimson.fatal("Unfortunately, commands cannot start with the bot sign due to compatibility reasons.");});
+        _.each(config.subprocesses, (v, key) => { if (typeof v !== "string") wrongType("subprocess ['subprocess']", "subprocesses", key); if (v.startsWith(config.sign)) crimson.fatal("Unfortunately, commands cannot start with the bot sign due to compatibility reasons.");});
         _.each(command.alias, (v, key) => { if (typeof v !== "string") wrongType("alias ['alias']", command.command, key); });
         _.each(command.args, (v, key) => { if (!(v instanceof Array)) wrongType("arguments ['args']", command.command, key); });
     });
