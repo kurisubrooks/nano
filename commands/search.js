@@ -3,9 +3,9 @@ const path = require('path');
 const core = require(path.join(__dirname, "../", "core.js"));
 const keychain = require(path.join(__dirname, "../", "keychain.js"));
 
-exports.main = (slack, channel, user, text, ts, config) => {
+exports.main = (slack, channel, user, args, ts, config) => {
     try {
-        var url = 'https://www.googleapis.com/customsearch/v1?key=' + keychain.google + '&num=1&cx=006735756282586657842:s7i_4ej9amu&q=' + encodeURIComponent(text);
+        var url = 'https://www.googleapis.com/customsearch/v1?key=' + keychain.google + '&num=1&cx=006735756282586657842:s7i_4ej9amu&q=' + encodeURIComponent(args);
 
         http.get(url, (res) => {
             if (res.statusCode == 200) {
