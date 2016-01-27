@@ -114,7 +114,7 @@ slack.on("message", (data) => {
                     supportedArgs.push(v.length);
                 });
                 // Continue if supported arguments count match argument count.
-                if (matched.args.length === 0 || supportedArgs.indexOf(args) !== -1) {
+                if (matched.args.length === 0 || supportedArgs.indexOf(args.length) !== -1) {
                     // Runs command.
                     var others = {config: config, command: originalCommand, masters: config.masters};
                     var module = require(path.join(__dirname, "commands", command + ".js"));
