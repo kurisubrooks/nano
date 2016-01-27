@@ -18,8 +18,7 @@ function shake_general(text) {
 
 shake.on("connect", () => {
     crimson.success("Connected to Shake.");
-    if (!config.debug) return;
-    shake_general("Connected to Shake.");
+    if (!config.debug ? null : shake_general("Connected to Shake."));
 });
 
 shake.on("data", data =>
@@ -183,7 +182,5 @@ slack.on("message", (data) => {
         }
     }
 });
-
-
 
 slack.login();
