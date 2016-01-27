@@ -3,9 +3,9 @@ const path = require('path');
 const core = require(path.join(__dirname, "../", "core.js"));
 const keychain = require(path.join(__dirname, "../", "keychain.js"));
 
-exports.main = (slack, channel, user, text, ts, config) => {
+exports.main = (slack, channel, user, args, ts, config) => {
     try {
-        var query = new YQL('select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="' + text + '") and u="c"');
+        var query = new YQL('select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="' + args.join(" ") + '") and u="c"');
 
         query.exec(function(error, data) {
             if (error) channel.send(core.errno + '```' + error + '```');

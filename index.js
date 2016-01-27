@@ -19,10 +19,10 @@ function shake_general(text) {
 
 shake.on("connect", () => {
     crimson.success("Connected to Shake.");
-    if (!config.debug ? null : shake_general("Connected to Shake."));
+    if (config.debug) shake_general("Connected to Shake.");
 });
 
-shake.on("data", data => 
+shake.on("data", data =>
     quake.run(slack, data));
 
 shake.on("reconnect", () => {
@@ -83,7 +83,7 @@ slack.on("open", () => crimson.nicedebug("Chat has been opened, and messages can
 slack.on("close", () => crimson.warn("Disconnected from Slack."));
 
 // Noooooo!
-slack.on("error", () => crimson.fatal("A Slack error has occured: " + util.inspect(error)));
+slack.on("error", (error) => crimson.fatal("A Slack error has occured: " + util.inspect(error)));
 
 slack.on("message", (data) => {
     // Do not continue if sender is self, or is not a message or a me_message.
@@ -107,45 +107,6 @@ slack.on("message", (data) => {
     // Define this so we can skip command parsing if Gifs or Reacts matched.
     var matchedReactOrGif = false;
 
-    // Foreach every part of the text.
-    _.each(text.split(" "), (part) => {
-        // If the parts start with the sign, remove the sign and continue, otherwose do not continue.
-        if (part.startsWith(config.sign)) part = part.slice(config.sign.length).toLowerCase();
-        else return;
-
-        // Reacts.
-        // If part exists in Reacts object.
-        if (typeof config.reacts[part] === "string") {
-            // Send reaction.
-            channel.send(config.reacts[part]);
-            // If text is equals to part, delete message.
-            if (text === config.sign + part) core.delMsg(channel.id, ts);
-            // Sets gif or reacts matched to true.
-            matchedReactOrGif = true;
-            // Do not continue for gifs.
-            return;
-        }
-
-        // Gifs.
-        if (typeof config.gifs[part] === "string") {
-            // Send Gif.
-            slack._apiCall("chat.postMessage", {
-                "as_user": true,
-                "channel": channel.id,
-                "attachments": JSON.stringify([{
-                    "fallback": "<gif>",
-                    "image_url": config.gifs[part]
-                }])
-            });
-            // If text is equals to part, delete message.
-            if (text === config.sign + part) core.delMsg(channel.id, ts);
-            // Sets gif or reacts matched to true.
-            matchedReactOrGif = true;
-        }
-    });
-
-    if (matchedReactOrGif) return;
-
     // Begin command checks.
     if (text.startsWith(config.sign) || im) {
         // Define array containing arguments.
@@ -163,21 +124,58 @@ slack.on("message", (data) => {
             if (matchedAlias.length > 0) command = matchedAlias[0];
             // If there are no command matches, do not continue.
             var matched = _.filter(commands, {command: command});
-            if (matched.length < 1) return;
-            // Set matched command to first matched command.
-            else matched = matched[0];
-            // Retrieves list of supported arguments count.
-            var supportedArgs = [];
-            _.each(matched.args, (v) => {
-                supportedArgs.push(v.length);
-            });
-            // If supported arguments count don't match argument count, do not continue.
-            if (matched.args.length !== 0 && supportedArgs.indexOf(args) === -1) return;
-            // Runs command.
-            var others = {config: config, command: originalCommand, masters: config.masters};
-            var module = require(path.join(__dirname, "commands", command + ".js"));
-            module.main(slack, channel, user, text, ts, others);
+            if (matched.length > 0) {
+                // Set matched command to first matched command.
+                matched = matched[0];
+                // Retrieves list of supported arguments count.
+                var supportedArgs = [];
+                _.each(matched.args, (v) => {
+                    supportedArgs.push(v.length);
+                });
+                // Continue if supported arguments count match argument count.
+                if (matched.args.length === 0 || supportedArgs.indexOf(args) !== -1) {
+                    // Runs command.
+                    var others = {config: config, command: originalCommand, masters: config.masters};
+                    var module = require(path.join(__dirname, "commands", command + ".js"));
+                    module.main(slack, channel, user, args, ts, others);
+                    return;
+                }
+            }
 
+            // Foreach every part of the text.
+            _.each(text.split(" "), (part) => {
+                // If the parts start with the sign, remove the sign and continue, otherwose do not continue.
+                if (part.startsWith(config.sign)) part = part.slice(config.sign.length).toLowerCase();
+                else return;
+
+                // Reacts.
+                // If part exists in Reacts object.
+                if (typeof config.reacts[part] === "string") {
+                    // Send reaction.
+                    channel.send(config.reacts[part]);
+                    // If text is equals to part, delete message.
+                    if (text === config.sign + part) core.delMsg(channel.id, ts);
+                    // Sets gif or reacts matched to true.
+                    matchedReactOrGif = true;
+                    // Do not continue for gifs.
+                    return;
+                }
+
+                // Gifs.
+                if (typeof config.gifs[part] === "string") {
+                    // Send Gif.
+                    slack._apiCall("chat.postMessage", {
+                        "as_user": true,
+                        "channel": channel.id,
+                        "attachments": JSON.stringify([{
+                            "fallback": "<gif>",
+                            "image_url": config.gifs[part]
+                        }])
+                    });
+                    // If text is equals to part, delete message.
+                    if (text === config.sign + part) core.delMsg(channel.id, ts);
+                }
+            });
         } catch(e) {
             channel.send("Failed to run command `" + command + "`. Here's what Na-nose: ```" + e + "```");
         }
