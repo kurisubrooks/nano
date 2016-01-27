@@ -6,34 +6,6 @@ const crimson = require("crimson");
 
 const core = require(path.join(__dirname, "core.js"));
 const keychain = require(path.join(__dirname, "keychain.js"));
-const quake = require(path.join(__dirname, "quake.js"));
-const shake = require("socket.io-client")(keychain.shake);
-
-function shake_general(text) {
-    slack._apiCall("chat.postMessage", {
-        as_user: true,
-        channel: "#general",
-        text: text
-    });
-}
-
-shake.on("connect", () => {
-    crimson.success("Connected to Shake.");
-    if (config.debug) shake_general("Connected to Shake.");
-});
-
-shake.on("data", data =>
-    quake.run(slack, data));
-
-shake.on("reconnect", () => {
-    crimson.warn("Connection to Shake was lost, reconnecting...");
-    shake_general("*Notice*: Connection to Shake was lost, reconnecting...");
-});
-
-shake.on("disconnect", () => {
-    crimson.error("Connection to Shake was lost!");
-    shake_general("*Error*: Connection to Shake was lost!");
-});
 
 // Debug mode.
 crimson.nicedebug = (text) => { if (config.debug) crimson.debug(text); };
@@ -54,8 +26,9 @@ try {
         if (!(config.masters instanceof Array)) wrongType("masters ['masters']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("alias ['alias']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("arguments ['args']", command.command, key);
-        _.each(command.alias, (v) => { if (typeof v !== "string") wrongType("alias ['alias']", command.command, key); });
-        _.each(command.args, (v) => { if (!(v instanceof Array)) wrongType("arguments ['args']", command.command, key); });
+        _.each(config.subprocesses, (v, key) => { if (typeof v !== "string") wrongType("subprocess ['subprocess']", "subprocesses", key); });
+        _.each(command.alias, (v, key) => { if (typeof v !== "string") wrongType("alias ['alias']", command.command, key); });
+        _.each(command.args, (v, key) => { if (!(v instanceof Array)) wrongType("arguments ['args']", command.command, key); });
     });
 
 } catch(e) {
@@ -65,6 +38,16 @@ try {
 
 // Initialise Slack and it's functions.
 var slack = new Slack(keychain.slack, true, true);
+
+_.each(config.subprocesses, (v) => {
+    try {
+        var subprocess = require(path.join(__dirname, "subprocesses", v + ".js"));
+        subprocess.main(slack, config, __dirname);
+    } catch(e) {
+        crimson.error("Failed to start subprocess '" + v + "'.");
+        crimson.fatal("Error: " + e);
+    }
+});
 
 // This fires when the client has authenticated with Slack servers.
 slack.on("loggedIn", (user, team) => {
