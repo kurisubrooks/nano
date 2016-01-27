@@ -7,7 +7,6 @@ const crimson = require("crimson");
 const core = require(path.join(__dirname, "core.js"));
 const keychain = require(path.join(__dirname, "keychain.js"));
 const quake = require(path.join(__dirname, "quake.js"));
-const shake = require("socket.io-client")(keychain.shake);
 
 function shake_general(text) {
     slack._apiCall("chat.postMessage", {
@@ -23,7 +22,7 @@ shake.on("connect", () => {
     shake_general("Connected to Shake.");
 });
 
-shake.on("data", data => 
+shake.on("data", data =>
     quake.run(slack, data));
 
 shake.on("reconnect", () => {
@@ -177,7 +176,7 @@ slack.on("message", (data) => {
             // Runs command.
             var others = {config: config, command: originalCommand, masters: config.masters};
             var module = require(path.join(__dirname, "commands", command + ".js"));
-            module.main(slack, channel, user, text, ts, others);
+            module.main(slack, channel, user, args, ts, others);
 
         } catch(e) {
             channel.send("Failed to run command `" + command + "`. Here's what Na-nose: ```" + e + "```");
