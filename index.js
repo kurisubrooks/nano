@@ -36,8 +36,7 @@ shake.on("disconnect", () => {
 });
 
 // Debug mode.
-var debug = false;
-crimson.nicedebug = (text) => { if (debug) crimson.debug(text); };
+crimson.nicedebug = (text) => { if (config.debug) crimson.debug(text); };
 
 const wrongType = (part, command, key) => crimson.fatal("Incorrect type for " + part + " in command " + command + " at key " + key + ".");
 
@@ -118,7 +117,6 @@ slack.on("message", (data) => {
         try {
             // Matches alias from command, to get original command.
             var matchedAlias = _.map(_.filter(commands, {alias: [command]}), "command");
-
             // If there are matches, set first match to command.
             var originalCommand = command;
             if (matchedAlias.length > 0) command = matchedAlias[0];

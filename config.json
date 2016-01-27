@@ -61,6 +61,12 @@
             "args": []
         },
         {
+            "command": "say",
+            "alias": ["s"],
+            "desc": "Say to Chat!",
+            "args": []
+        },
+        {
             "command": "exit",
             "alias": ["gtfo"],
             "desc": "Unplug the Power",
