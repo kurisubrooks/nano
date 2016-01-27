@@ -1,100 +1,75 @@
-const YQL = require('YQL');
-const path = require('path');
+const _ = require("lodash");
+const path = require("path");
+const request = require("request");
 const core = require(path.join(__dirname, "../", "core.js"));
 const keychain = require(path.join(__dirname, "../", "keychain.js"));
 
-exports.main = (slack, channel, user, args, ts, config) => {
-    try {
-        var query = new YQL('select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="' + args.join(" ") + '") and u="c"');
+const util = require("util");
 
-        query.exec(function(error, data) {
-            if (error) channel.send(core.errno + '```' + error + '```');
-            else {
-                if (data.query.results === null) channel.send('*Error*: Your query returned no results.');
-                else if (data.query.results !== null) {
-                    var condition = data.query.results.channel.item.condition;
-                    var location = data.query.results.channel.location;
-                    var forecast = data.query.results.channel.item.forecast;
-                    var forecast_text = '';
-
-                    for (var i = 0; i < 5; i++) {
-                        forecast_text += '*' + forecast[i].day + '*, ' + forecast[i].date + '\n' +
-                        forecast[i].text + ', Min: ' + forecast[i].low + 'º, Max: ' + forecast[i].high + 'º' + '\n\n';
-                    }
-
-                    var attachments = [{
-                        'color': core.info,
-                        'fallback': 'Here\'s the forecast for ' + location.city + '.',
-                        'title': emoji_type(condition.code) + ' ' + location.city + ', ' + location.region + ' ' + location.country,
-                        'mrkdwn_in': ['text'],
-                        'text': forecast_text
-                    }];
-
-                    slack._apiCall('chat.postMessage', {
-                        'as_user': true,
-                        'channel': channel.id,
-                        'attachments': JSON.stringify(attachments)
-                    }, core.delMsg(channel.id, ts));
-                }
-            }
-        });
-    }
-
-    catch (error){
-        channel.send(core.errno + '```' + error + '```');
-    }
+// Do not change this to ES6, does not work then.
+String.prototype.toUpperLowerCase = function() {
+    var string = this.split("");
+    string[0] = string[0].toUpperCase();
+    return string.join("");
 };
 
-function emoji_type(code) {
-    // https://developer.yahoo.com/weather/documentation.html
-    if  (code == '0')   return ':cyclone: :dash:';
-    else if (code == '1')   return ':cyclone: :dash: :leaves:';
-    else if (code == '2')   return ':cyclone: :dash:';
-    else if (code == '3')   return ':zap: :sweat_drops:';
-    else if (code == '4')   return ':zap: :umbrella:';
-    else if (code == '5')   return ':umbrella: :snowflake:';
-    else if (code == '6')   return ':umbrella: :snowflake:';
-    else if (code == '7')   return ':snowflake:';
-    else if (code == '8')   return ':snowflake: :sweat_drops:';
-    else if (code == '9')   return ':sweat_drops:';
-    else if (code == '10')  return ':snowflake: :sweat_drops:';
-    else if (code == '11')  return ':umbrella:';
-    else if (code == '12')  return ':umbrella:';
-    else if (code == '13')  return ':snowflake:';
-    else if (code == '14')  return ':snowflake: :umbrella:';
-    else if (code == '15')  return ':snowflake: :dash:';
-    else if (code == '16')  return ':snowflake:';
-    else if (code == '17')  return ':snowflake:';
-    else if (code == '18')  return ':snowflake:';
-    else if (code == '19')  return ':dash:';
-    else if (code == '20')  return ':cloud:';
-    else if (code == '21')  return ':cloud:';
-    else if (code == '22')  return ':fire: :dash:';
-    else if (code == '23')  return ':leaves: :dash:';
-    else if (code == '24')  return ':leaves: :dash:';
-    else if (code == '25')  return ':snowflake:';
-    else if (code == '26')  return ':cloud:';
-    else if (code == '27')  return ':cloud:';
-    else if (code == '28')  return ':cloud:';
-    else if (code == '29')  return ':partly_sunny:';
-    else if (code == '30')  return ':partly_sunny:';
-    else if (code == '31')  return ':sunny:';
-    else if (code == '32')  return ':sunny:';
-    else if (code == '33')  return ':partly_sunny:';
-    else if (code == '34')  return ':partly_sunny:';
-    else if (code == '35')  return ':umbrella: :snowflake:';
-    else if (code == '36')  return ':sunny: :fire:';
-    else if (code == '37')  return ':sunny:';
-    else if (code == '38')  return ':zap: :umbrella:';
-    else if (code == '39')  return ':zap: :umbrella:';
-    else if (code == '40')  return ':cloud: :umbrella:';
-    else if (code == '41')  return ':snowflake: :umbrella:';
-    else if (code == '42')  return ':snowflake: :umbrella:';
-    else if (code == '43')  return ':cloud: :snowflake:';
-    else if (code == '44')  return ':partly_sunny:';
-    else if (code == '45')  return ':zap: :umbrella:';
-    else if (code == '46')  return ':snowflake: :umbrella:';
-    else if (code == '47')  return ':zap: :cloud:';
-    else if (code == '3200')return ':partly_sunny:';
-    else return ':question:';
-}
+exports.main = (slack, channel, user, args, ts, config) => {
+    request.get({url: "https://api.wunderground.com/api/" + keychain.wunderground + "/geolookup/q/" + encodeURIComponent(args.join(" ")) + ".json"}, (error, response) => {
+        if (error) {
+            channel.send("*Error:* Cannot connect to Wunderground servers.");
+            return;
+        }
+        var body = JSON.parse(response.body);
+        if (body.response.error) {
+            channel.send("*Wunderground Error:* " + (body.response.error.description).toUpperLowerCase() + ".");
+            return;
+        }
+        if (body.response.results && body.response.results.length > 1) {
+            var places = [];
+            _.each(body.response.results, (v) => {
+                var place = "_";
+                if (v.name === v.city) place += v.name;
+                else place = v.name + ", " + v.city;
+                if (v.state) place += ", " + v.state;
+                if (v.country_name) place += ", " + v.country_name;
+                place += "_";
+                places.push(place);
+            });
+            var lastPlace = places.pop();
+            channel.send("*Wunderground Error:* Did you mean " + places.join(", ") + " or " + lastPlace + ".");
+            return;
+        }
+        var location;
+        if (body.location.city) location = body.location.city;
+        if (body.location.state) location += ", " + body.location.state;
+        if (body.location.country_name) location += ", " + body.location.country_name;
+        request.get({url: "https://api.wunderground.com/api/" + keychain.wunderground + "/forecast/q/" + encodeURIComponent(args.join(" ")) + ".json"}, (error, response) => {
+            if (error) {
+                channel.send("*Error:* Cannot connect to Wunderground servers.");
+                return;
+            }
+            var body = JSON.parse(response.body);
+            if (body.response.error) {
+                channel.send("*Wunderground Error:* " + (body.response.error.description).toUpperLowerCase() + ".");
+                return;
+            }
+            var forecast = [];
+            _.each(body.forecast.simpleforecast.forecastday, (v) => {
+                forecast.push("*" + v.date.weekday_short + ",* " + v.date.day + " " + v.date.monthname + " " + v.date.year + "\n" +
+                v.date.ampm + " " + v.conditions + ", Min: " + v.low.celsius + "º, Max: " + v.high.celsius + "º");
+            });
+            slack._apiCall("chat.postMessage", {
+                "as_user": true,
+                "channel": channel.id,
+                "attachments": JSON.stringify([{
+                    color: core.info,
+                    fallback: "Here's the forecast for " + location + ".",
+                    title: location,
+                    mrkdwn_in: ["text"],
+                    text: forecast.join("\n\n"),
+                    thumb_url: body.forecast.simpleforecast.forecastday[0].icon_url
+                }])
+            }, core.delMsg(channel.id, ts));
+        });
+    });
+};
