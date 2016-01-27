@@ -2,6 +2,9 @@
     "sign": "!",
     "debug": false,
     "masters": ["U0E56N7UK", "U0E4ZL97H"],
+    "subprocesses": [
+        "quake"
+    ],
     "gifs": {
         "facepalm": "https://media.giphy.com/media/8BYLSNmnJYQxy/giphy.gif",
         "pantsu": "https://media.giphy.com/media/79kGG4pjwlFh6/giphy.gif",
