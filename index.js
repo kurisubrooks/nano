@@ -26,7 +26,7 @@ try {
         if (!(config.masters instanceof Array)) wrongType("masters ['masters']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("alias ['alias']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("arguments ['args']", command.command, key);
-        _.each(config.subprocesses, (v, key) => { if (typeof v !== "string") wrongType("subprocess ['subprocess']", "subprocesses", key); });
+        _.each(config.subprocesses, (v, key) => { if (typeof v !== "string") wrongType("subprocess ['subprocess']", "subprocesses", key); if (v.startsWith(config.sign)) crimson.fatal("Unfortunately, commands cannot start with the bot sign due to compatibility reasons.");});
         _.each(command.alias, (v, key) => { if (typeof v !== "string") wrongType("alias ['alias']", command.command, key); });
         _.each(command.args, (v, key) => { if (!(v instanceof Array)) wrongType("arguments ['args']", command.command, key); });
     });
@@ -114,7 +114,7 @@ slack.on("message", (data) => {
                     supportedArgs.push(v.length);
                 });
                 // Continue if supported arguments count match argument count.
-                if (matched.args.length === 0 || supportedArgs.indexOf(args) !== -1) {
+                if (matched.args.length === 0 || supportedArgs.indexOf(args.length) !== -1) {
                     // Runs command.
                     var others = {config: config, command: originalCommand, masters: config.masters};
                     var module = require(path.join(__dirname, "commands", command + ".js"));

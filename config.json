@@ -70,10 +70,16 @@
             "args": []
         },
         {
+            "command": "radar",
+            "alias": ["r"],
+            "desc": "Radar for Penrith, AU.",
+            "args": [[]]
+        },
+        {
             "command": "exit",
             "alias": ["gtfo"],
             "desc": "Unplug the Power",
-            "args": []
+            "args": [[]]
         }
     ]
 }
