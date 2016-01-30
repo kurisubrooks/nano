@@ -59,18 +59,14 @@ exports.main = (slack, config, botdir) => {
                 "as_user": true,
                 "channel": "C0E50GQDQ",
                 "attachments": JSON.stringify([attachment])
-            }, (data) => {
-                latestTS = data.ts;
-            });
+            }, (data) => latestTS = data.ts);
         } else {
             slack._apiCall("chat.update", {
                 "ts": this.latestTS,
                 "channel": "C0E50GQDQ",
                 "text": " ",
                 "attachments": JSON.stringify([attachment])
-            }, (data) => {
-                latestTS = data.ts;
-            });
+            }, (data) => latestTS = data.ts);
         }
     }
 };
