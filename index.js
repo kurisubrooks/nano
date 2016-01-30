@@ -51,9 +51,6 @@ _.each(config.subprocesses, (v) => {
 
 // This fires when the client has authenticated with Slack servers.
 slack.on("loggedIn", (user, team) => {
-    // Enable debug mode if enabled in config or if bot name does not match logged in name.
-    if (config.debug) debug = true;
-
     crimson.info("Logged in to team " + team.name + " (" + team.id + ") as " + user.name + " (" + user.id + ").");
     crimson.nicedebug("Please note that messages will not be received until the chat is opened.");
 });
