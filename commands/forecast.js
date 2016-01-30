@@ -36,6 +36,13 @@ exports.main = (slack, channel, user, args, ts, config) => {
                 places.push(place);
             });
             var lastPlace = places.pop();
+
+            if(places.length > 2) {
+                var newPlaces = places.slice(0, 2);
+                lastPlace = (places.length - newPlaces.length) + " others";
+                place = newPlaces;
+            }
+
             channel.send("*Wunderground Error:* Did you mean " + places.join(", ") + " or " + lastPlace + ".");
             return;
         }

@@ -51,9 +51,6 @@ _.each(config.subprocesses, (v) => {
 
 // This fires when the client has authenticated with Slack servers.
 slack.on("loggedIn", (user, team) => {
-    // Enable debug mode if enabled in config or if bot name does not match logged in name.
-    if (config.debug) debug = true;
-
     crimson.info("Logged in to team " + team.name + " (" + team.id + ") as " + user.name + " (" + user.id + ").");
     crimson.nicedebug("Please note that messages will not be received until the chat is opened.");
 });
@@ -86,9 +83,6 @@ slack.on("message", (data) => {
     // Indicate in console that we've got chat.
     crimson.info("Message: [" + type + "]<" + channel.name + "> " + user.name + ": " + text);
 
-    // Define this so we can skip command parsing if Gifs or Reacts matched.
-    var matchedReactOrGif = false;
-
     // Begin command checks.
     if (text.startsWith(config.sign) || im) {
         // Define array containing arguments.
@@ -96,7 +90,6 @@ slack.on("message", (data) => {
         // Define raw command, without command sign sliced.
         command = args.splice(0, 1)[0].toLowerCase();
         if (command.startsWith(config.sign)) command = command.slice(config.sign.length);
-
         try {
             // Matches alias from command, to get original command.
             var matchedAlias = _.map(_.filter(commands, {alias: [command]}), "command");
@@ -122,45 +115,48 @@ slack.on("message", (data) => {
                     return;
                 }
             }
-
-            // Foreach every part of the text.
-            _.each(text.split(" "), (part) => {
-                // If the parts start with the sign, remove the sign and continue, otherwose do not continue.
-                if (part.startsWith(config.sign)) part = part.slice(config.sign.length).toLowerCase();
-                else return;
-
-                // Reacts.
-                // If part exists in Reacts object.
-                if (typeof config.reacts[part] === "string") {
-                    // Send reaction.
-                    channel.send(config.reacts[part]);
-                    // If text is equals to part, delete message.
-                    if (text === config.sign + part) core.delMsg(channel.id, ts);
-                    // Sets gif or reacts matched to true.
-                    matchedReactOrGif = true;
-                    // Do not continue for gifs.
-                    return;
-                }
-
-                // Gifs.
-                if (typeof config.gifs[part] === "string") {
-                    // Send Gif.
-                    slack._apiCall("chat.postMessage", {
-                        "as_user": true,
-                        "channel": channel.id,
-                        "attachments": JSON.stringify([{
-                            "fallback": "<gif>",
-                            "image_url": config.gifs[part]
-                        }])
-                    });
-                    // If text is equals to part, delete message.
-                    if (text === config.sign + part) core.delMsg(channel.id, ts);
-                }
-            });
         } catch(e) {
             channel.send("Failed to run command `" + command + "`. Here's what Na-nose: ```" + e + "```");
         }
     }
+
+    var reactOrGifMatched = false;
+
+    // Foreach every part of the text.
+    _.each(text.split(" "), (part) => {
+        if(reactOrGifMatched) return false;
+        // If the parts start with the sign, remove the sign and continue, otherwose do not continue.
+        if (part.startsWith(config.sign)) part = part.slice(config.sign.length).toLowerCase();
+        else return;
+
+        // Reacts.
+        // If part exists in Reacts object.
+        if (typeof config.reacts[part] === "string") {
+            // Send reaction.
+            channel.send(config.reacts[part]);
+            // If text is equals to part, delete message.
+            if (text === config.sign + part) core.delMsg(channel.id, ts);
+            // Do not continue.
+            reactOrGifMatched = true;
+        }
+
+        // Gifs.
+        else if (typeof config.gifs[part] === "string") {
+            // Send Gif.
+            slack._apiCall("chat.postMessage", {
+                "as_user": true,
+                "channel": channel.id,
+                "attachments": JSON.stringify([{
+                    "fallback": "<gif>",
+                    "image_url": config.gifs[part]
+                }])
+            });
+            // If text is equals to part, delete message.
+            if (text === config.sign + part) core.delMsg(channel.id, ts);
+            // Do not continue.
+            reactOrGifMatched = true;
+        }
+    });
 });
 
 slack.login();
