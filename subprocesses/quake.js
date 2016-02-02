@@ -9,17 +9,19 @@ exports.main = (slack, config, botdir) => {
     const keychain = require(path.join(botdir, "keychain.js"));
     const shake = require("socket.io-client")(keychain.shake);
 
-    function shake_general(text) {
+    function kurisu_pls(text) {
         slack._apiCall("chat.postMessage", {
-            as_user: true,
-            channel: "#general",
-            text: text
+            "as_user": false,
+            "username": "shake",
+            "icon_url": "http://i.imgur.com/taEr9cQ.png",
+            "channel": "@kurisu",
+            "text": text
         });
     }
 
     shake.on("connect", () => {
         crimson.success("Connected to Shake.");
-        if (config.debug) shake_general("Connected to Shake.");
+        kurisu_pls("*Success*: Connected.");
     });
 
     shake.on("data", data =>
@@ -27,12 +29,12 @@ exports.main = (slack, config, botdir) => {
 
     shake.on("reconnect", () => {
         crimson.warn("Connection to Shake was lost, reconnecting...");
-        shake_general("*Notice*: Connection to Shake was lost, reconnecting...");
+        kurisu_pls("*Notice*: Reconnecting...");
     });
 
     shake.on("disconnect", () => {
         crimson.error("Connection to Shake was lost!");
-        shake_general("*Error*: Connection to Shake was lost!");
+        kurisu_pls("*Error*: Disconnected!");
     });
 
     function run(slack, data) {
@@ -56,7 +58,9 @@ exports.main = (slack, config, botdir) => {
         if (latestQuake !== data.earthquake_id) {
             latestQuake = data.earthquake_id;
             slack._apiCall("chat.postMessage", {
-                "as_user": true,
+                "as_user": false,
+                "username": "shake",
+                "icon_url": "http://i.imgur.com/taEr9cQ.png",
                 "channel": "C0E50GQDQ",
                 "attachments": JSON.stringify([attachment])
             }, (data) => latestTS = data.ts);
