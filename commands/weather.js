@@ -51,15 +51,15 @@ exports.main = (slack, channel, user, args, ts, config) => {
             "as_user": true,
             "channel": channel.id,
             "attachments": JSON.stringify([{
-                color: core.info,
-                fallback: "Here's the weather for " + location + ".",
-                title: location,
-                thumb_url: body.current_observation.icon_url,
-                mrkdwn_in: ["text"],
+                "color": core.info,
+                "fallback": "Here's the weather for " + location + ".",
+                "title": location,
+                "thumb_url": body.current_observation.icon_url,
+                "mrkdwn_in": ["text"],
                 "text":
-                "*Temperature:* " + body.current_observation.temp_c + "º\n" +
-                "*Humidity:* " + body.current_observation.relative_humidity + "\n" +
-                "*Wind Speed:* " + body.current_observation.wind_kph + "km/h"
+                    "*Temperature:* " + body.current_observation.temp_c + "º\n" +
+                    "*Humidity:* " + body.current_observation.relative_humidity + "\n" +
+                    "*Wind Speed:* " + body.current_observation.wind_kph + "km/h"
             }])
         }, core.delMsg(channel.id, ts));
     });
