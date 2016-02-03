@@ -14,14 +14,14 @@ exports.main = (slack, config, botdir) => {
             "as_user": false,
             "username": "shake",
             "icon_url": "http://i.imgur.com/taEr9cQ.png",
-            "channel": "@kurisu",
+            "channel": "G0KDNTCF3",
             "text": text
         });
     }
 
     shake.on("connect", () => {
         crimson.success("Connected to Shake.");
-        kurisu_pls("*Success*: Connected.");
+        if (config.debug) kurisu_pls("Connected.");
     });
 
     shake.on("data", data =>
@@ -29,7 +29,7 @@ exports.main = (slack, config, botdir) => {
 
     shake.on("reconnect", () => {
         crimson.warn("Connection to Shake was lost, reconnecting...");
-        kurisu_pls("*Notice*: Reconnecting...");
+        if (config.debug) kurisu_pls("Reconnecting...");
     });
 
     shake.on("disconnect", () => {
