@@ -33,7 +33,7 @@ try {
 
 } catch(e) {
     crimson.error("Failed to start. Either config.json is not present, corrupted or missing arguments.");
-    crimson.fatal("Error: " + e);
+    crimson.fatal(e);
 }
 
 // Initialise Slack and it's functions.
@@ -45,7 +45,7 @@ _.each(config.subprocesses, (v) => {
         subprocess.main(slack, config, __dirname);
     } catch(e) {
         crimson.error("Failed to start subprocess '" + v + "'.");
-        crimson.fatal("Error: " + e);
+        crimson.fatal(e);
     }
 });
 
