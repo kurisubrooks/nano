@@ -3,6 +3,7 @@
     "debug": false,
     "masters": ["U0E56N7UK", "U0E4ZL97H"],
     "subprocesses": [
+        "fire",
         "quake"
     ],
     "gifs": {
@@ -31,7 +32,8 @@
         "court": "https://31.media.tumblr.com/ce3a5d35909187e834cad4abc6a3d130/tumblr_inline_nw7lp6X2Ut1qafrh6_500.gif",
         "sued": "https://media0.giphy.com/media/OqCZgQySXvaP6/200.gif",
         "me": "https://49.media.tumblr.com/32c265e66bff555c4e1f8699f030912f/tumblr_ndk236rgo81rn5wi5o4_500.gif",
-        "idc": "http://wp.patheos.com.s3.amazonaws.com/blogs/thecrescat/files/2013/09/I-won-t-hear-it-and-I-won-t-respond-to-it-animated-gif-arrested-development-31133206-500-235.gif"
+        "idc": "http://wp.patheos.com.s3.amazonaws.com/blogs/thecrescat/files/2013/09/I-won-t-hear-it-and-I-won-t-respond-to-it-animated-gif-arrested-development-31133206-500-235.gif",
+        "both": "https://33.media.tumblr.com/0ae4a458b02b1705c96dd846493e2aad/tumblr_inline_n3ghj9J3u91qcklud.gif"
     },
     "reacts": {
         "shrug": "¯\\_(ツ)_/¯",
