@@ -21,7 +21,7 @@ exports.main = (slack, config, botdir) => {
 
     shake.on("connect", () => {
         crimson.success("Connected to Shake.");
-        if (config.debug) kurisu_pls("Connected.");
+        kurisu_pls("Connected.");
     });
 
     shake.on("data", data =>
