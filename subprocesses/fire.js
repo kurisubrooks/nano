@@ -11,22 +11,22 @@ exports.main = (slack, config, botdir) => {
     const url = "http://www.rfs.nsw.gov.au/feeds/major-Fire-Updates.xml";
     const icon = "https://i.imgur.com/y9ZkIld.png";
     const interval = 2500;
-    
+
     function check() {
-        request(test, function (error, response, output) {
+        request(url, function (error, response, output) {
             if (error) crimson.error(error);
             else if (output === undefined) crimson.error("Output was undefined. Source may be down.");
-            
+
             parser.parseString(output, function (error, response) {
                 if (error) logger.error(error);
                 if (response === undefined) crimson.error("Parsed XML was undefined. Source may be down.");
                 if (cache.length === 0) cache = response;
-                
+
                 for (i = 0; i < response.rss.channel[0].item.length; i++) {
                     if (cache.rss.channel[0].item[i].guid[0] === response.rss.channel[0].item[i].guid[0]) return;
                     else {
                         cache = response;
-                        
+
                         slack._apiCall("chat.postMessage", {
                             "as_user": false,
                             "username": "kasai",
@@ -43,12 +43,12 @@ exports.main = (slack, config, botdir) => {
                         });
                     }
                 }
-                
+
                 crimson.info(response);
             });
         });
     }
-    
+
     setInterval(() => {
         try {
             check();
@@ -56,6 +56,6 @@ exports.main = (slack, config, botdir) => {
             crimson.error("lol oops missed this one: " + error);
         }
     }, interval);
-    
+
     check();
 };
