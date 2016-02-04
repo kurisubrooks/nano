@@ -37,7 +37,7 @@ exports.main = (slack, channel, user, args, ts, config) => {
             });
             var lastPlace = places.pop();
 
-            if(places.length > 2) {
+            if (places.length > 2) {
                 var newPlaces = places.slice(0, 2);
                 lastPlace = (places.length - newPlaces.length) + " others";
                 place = newPlaces;
@@ -51,6 +51,8 @@ exports.main = (slack, channel, user, args, ts, config) => {
             "as_user": true,
             "channel": channel.id,
             "attachments": JSON.stringify([{
+                "author_name": config.trigger.name,
+                "author_icon": config.trigger.icon,
                 "color": core.info,
                 "fallback": "Here's the weather for " + location + ".",
                 "title": location,

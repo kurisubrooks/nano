@@ -69,12 +69,14 @@ exports.main = (slack, channel, user, args, ts, config) => {
                 "as_user": true,
                 "channel": channel.id,
                 "attachments": JSON.stringify([{
-                    color: core.info,
-                    fallback: "Here's the forecast for " + location + ".",
-                    title: location,
-                    mrkdwn_in: ["text"],
-                    text: forecast.join("\n\n"),
-                    thumb_url: body.forecast.simpleforecast.forecastday[0].icon_url
+                    "author_name": config.trigger.name,
+                    "author_icon": config.trigger.icon,
+                    "color": core.info,
+                    "fallback": "Here's the forecast for " + location + ".",
+                    "title": location,
+                    "mrkdwn_in": ["text"],
+                    "text": forecast.join("\n\n"),
+                    "thumb_url": body.forecast.simpleforecast.forecastday[0].icon_url
                 }])
             }, core.delMsg(channel.id, ts));
         });

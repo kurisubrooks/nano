@@ -24,6 +24,8 @@ exports.main = (slack, channel, user, args, ts, config) => {
                     } else thumb_url = "";
 
                     var attachments = [{
+                        "author_name": config.trigger.name,
+                        "author_icon": config.trigger.icon,
                         "fallback": "Here\"s what I found:",
                         "color": core.info,
                         "title": result.items[0].title,

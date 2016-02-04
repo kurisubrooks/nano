@@ -7,6 +7,8 @@ exports.main = (slack, channel, user, args, ts, config) => {
             "as_user": true,
             "channel": channel.id,
             "attachments": JSON.stringify([{
+                "author_name": config.trigger.name,
+                "author_icon": config.trigger.icon,
                 "fallback": "brb",
                 "image_url": "http://i.imgur.com/kiKRmYY.gif"
             }])
@@ -16,5 +18,5 @@ exports.main = (slack, channel, user, args, ts, config) => {
         });
     }
 
-    else channel.send("Y-you\'re not Hakase!");
+    else channel.send("お前は博士じゃない！");
 };
