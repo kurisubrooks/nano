@@ -44,7 +44,7 @@ exports.main = (slack, config, botdir) => {
                     }
                 }
 
-                crimson.info(response);
+                //crimson.info(response);
             });
         });
     }
