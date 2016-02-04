@@ -26,7 +26,10 @@ try {
         if (!(config.masters instanceof Array)) wrongType("masters ['masters']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("alias ['alias']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("arguments ['args']", command.command, key);
-        _.each(config.subprocesses, (v, key) => { if (typeof v !== "string") wrongType("subprocess ['subprocess']", "subprocesses", key); if (v.startsWith(config.sign)) crimson.fatal("Unfortunately, commands cannot start with the bot sign due to compatibility reasons.");});
+        _.each(config.subprocesses, (v, key) => {
+            if (typeof v !== "string") wrongType("subprocess ['subprocess']", "subprocesses", key); 
+            if (v.startsWith(config.sign)) crimson.fatal("Unfortunately, commands cannot start with the bot sign due to compatibility reasons.");
+        });
         _.each(command.alias, (v, key) => { if (typeof v !== "string") wrongType("alias ['alias']", command.command, key); });
         _.each(command.args, (v, key) => { if (!(v instanceof Array)) wrongType("arguments ['args']", command.command, key); });
     });
@@ -103,13 +106,19 @@ slack.on("message", (data) => {
                 matched = matched[0];
                 // Retrieves list of supported arguments count.
                 var supportedArgs = [];
-                _.each(matched.args, (v) => {
-                    supportedArgs.push(v.length);
-                });
+                _.each(matched.args, (v) => supportedArgs.push(v.length));
                 // Continue if supported arguments count match argument count.
                 if (matched.args.length === 0 || supportedArgs.indexOf(args.length) !== -1) {
                     // Runs command.
-                    var others = {config: config, command: originalCommand, masters: config.masters};
+                    var others = {
+                        config: config,
+                        command: originalCommand,
+                        masters: config.masters,
+                        trigger: {
+                            name: data._client.users[data.user].profile.first_name,
+                            icon: data._client.users[data.user].profile.image_32
+                        }
+                    };
                     var module = require(path.join(__dirname, "commands", command + ".js"));
                     module.main(slack, channel, user, args, ts, others);
                     return;
@@ -133,7 +142,13 @@ slack.on("message", (data) => {
         // If part exists in Reacts object.
         if (typeof config.reacts[part] === "string") {
             // Send reaction.
-            channel.send(config.reacts[part]);
+            slack._apiCall("chat.postMessage", {
+                "as_user": false,
+                "username": user.name,
+                "icon_url": data._client.users[data.user].profile.image_32,
+                "channel": channel.id,
+                "text": config.reacts[part]
+            });
             // If text is equals to part, delete message.
             if (text === config.sign + part) core.delMsg(channel.id, ts);
             // Do not continue.
@@ -144,7 +159,9 @@ slack.on("message", (data) => {
         else if (typeof config.gifs[part] === "string") {
             // Send Gif.
             slack._apiCall("chat.postMessage", {
-                "as_user": true,
+                "as_user": false,
+                "username": user.name,
+                "icon_url": data._client.users[data.user].profile.image_32,
                 "channel": channel.id,
                 "attachments": JSON.stringify([{
                     "fallback": "<gif>",
