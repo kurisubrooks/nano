@@ -37,7 +37,7 @@ exports.main = (slack, channel, user, args, ts, config) => {
             });
             var lastPlace = places.pop();
 
-            if(places.length > 2) {
+            if (places.length > 2) {
                 var newPlaces = places.slice(0, 2);
                 lastPlace = (places.length - newPlaces.length) + " others";
                 place = newPlaces;
@@ -51,15 +51,17 @@ exports.main = (slack, channel, user, args, ts, config) => {
             "as_user": true,
             "channel": channel.id,
             "attachments": JSON.stringify([{
-                color: core.info,
-                fallback: "Here's the weather for " + location + ".",
-                title: location,
-                thumb_url: body.current_observation.icon_url,
-                mrkdwn_in: ["text"],
+                "author_name": config.trigger.name,
+                "author_icon": config.trigger.icon,
+                "color": core.info,
+                "fallback": "Here's the weather for " + location + ".",
+                "title": location,
+                "thumb_url": body.current_observation.icon_url,
+                "mrkdwn_in": ["text"],
                 "text":
-                "*Temperature:* " + body.current_observation.temp_c + "º\n" +
-                "*Humidity:* " + body.current_observation.relative_humidity + "\n" +
-                "*Wind Speed:* " + body.current_observation.wind_kph + "km/h"
+                    "*Temperature:* " + body.current_observation.temp_c + "º\n" +
+                    "*Humidity:* " + body.current_observation.relative_humidity + "\n" +
+                    "*Wind Speed:* " + body.current_observation.wind_kph + "km/h"
             }])
         }, core.delMsg(channel.id, ts));
     });
