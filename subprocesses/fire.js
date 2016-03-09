@@ -16,36 +16,35 @@ exports.main = (slack, config, botdir) => {
         request(url, function (error, response, output) {
             if (error) crimson.error(error);
             else if (output === undefined) crimson.error("Output was undefined. Source may be down.");
+            else {
+                parser.parseString(output, function (error, response) {
+                    if (error) logger.error(error);
+                    if (response === undefined) crimson.error("Parsed XML was undefined. Source may be down.");
+                    if (cache.length === 0) cache = response;
 
-            parser.parseString(output, function (error, response) {
-                if (error) logger.error(error);
-                if (response === undefined) crimson.error("Parsed XML was undefined. Source may be down.");
-                if (cache.length === 0) cache = response;
+                    for (i = 0; i < response.rss.channel[0].item.length; i++) {
+                        if (cache.rss.channel[0].item[i].guid[0] === response.rss.channel[0].item[i].guid[0]) return;
+                        else {
+                            cache = response;
 
-                for (i = 0; i < response.rss.channel[0].item.length; i++) {
-                    if (cache.rss.channel[0].item[i].guid[0] === response.rss.channel[0].item[i].guid[0]) return;
-                    else {
-                        cache = response;
-
-                        slack._apiCall("chat.postMessage", {
-                            "as_user": false,
-                            "username": "kasai",
-                            "icon_url": icon,
-                            "channel": "#general",
-                            "attachments": [{
-                                "color": "#792C2C",
-                                "mrkdwn_in": ['text'],
-                                "title": response.rss.channel[0].item[i].title[0],
-                                "fallback": "An RFS Fire Alert has been issued.",
-                                "text": '*' + response.rss.channel[0].item[i].title[0] + '*\n' +
-                                              response.rss.channel[0].item[i].description[0]
-                            }]
-                        });
+                            slack._apiCall("chat.postMessage", {
+                                "as_user": false,
+                                "username": "kasai",
+                                "icon_url": icon,
+                                "channel": "#general",
+                                "attachments": [{
+                                    "color": "#792C2C",
+                                    "mrkdwn_in": ['text'],
+                                    "title": response.rss.channel[0].item[i].title[0],
+                                    "fallback": "An RFS Fire Alert has been issued.",
+                                    "text": '*' + response.rss.channel[0].item[i].title[0] + '*\n' +
+                                                  response.rss.channel[0].item[i].description[0]
+                                }]
+                            });
+                        }
                     }
-                }
-
-                //crimson.info(response);
-            });
+                });
+            }
         });
     }
 
