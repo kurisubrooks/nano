@@ -11,9 +11,9 @@ exports.main = (slack, config, botdir) => {
 
     function kurisu_pls(text) {
         slack._apiCall("chat.postMessage", {
-            "as_user": false,
-            "username": "shake",
-            "icon_url": "http://i.imgur.com/taEr9cQ.png",
+            "as_user": true,
+            //"username": "shake",
+            //"icon_url": "http://i.imgur.com/taEr9cQ.png",
             "channel": "G0KDNTCF3",
             "text": text
         });
@@ -58,9 +58,9 @@ exports.main = (slack, config, botdir) => {
         if (latestQuake !== data.earthquake_id) {
             latestQuake = data.earthquake_id;
             slack._apiCall("chat.postMessage", {
-                "as_user": false,
-                "username": "shake",
-                "icon_url": "http://i.imgur.com/taEr9cQ.png",
+                "as_user": true,
+                //"username": "shake",
+                //"icon_url": "http://i.imgur.com/taEr9cQ.png",
                 "channel": "C0E50GQDQ",
                 "attachments": JSON.stringify([attachment])
             }, (data) => latestTS = data.ts);
