@@ -30,10 +30,11 @@
         "gj": "https://i.imgur.com/x8dlKT1.gif",
         "daisuki": "https://i.imgur.com/H3KKlHc.gif",
         "court": "https://31.media.tumblr.com/ce3a5d35909187e834cad4abc6a3d130/tumblr_inline_nw7lp6X2Ut1qafrh6_500.gif",
-        "sued": "https://media0.giphy.com/media/OqCZgQySXvaP6/200.gif",
         "me": "https://49.media.tumblr.com/32c265e66bff555c4e1f8699f030912f/tumblr_ndk236rgo81rn5wi5o4_500.gif",
         "idc": "http://wp.patheos.com.s3.amazonaws.com/blogs/thecrescat/files/2013/09/I-won-t-hear-it-and-I-won-t-respond-to-it-animated-gif-arrested-development-31133206-500-235.gif",
-        "both": "https://33.media.tumblr.com/0ae4a458b02b1705c96dd846493e2aad/tumblr_inline_n3ghj9J3u91qcklud.gif"
+        "both": "https://33.media.tumblr.com/0ae4a458b02b1705c96dd846493e2aad/tumblr_inline_n3ghj9J3u91qcklud.gif",
+        "ugh": "https://media0.giphy.com/media/gVoQge4JXndPq/giphy.gif",
+        "facedesk": "http://vignette4.wikia.nocookie.net/r2da/images/0/07/Facedesk.gif"
     },
     "reacts": {
         "shrug": "¯\\_(ツ)_/¯",
@@ -43,7 +44,7 @@
         "nbc": ":stars: *NBC*\n_the more you know_",
         "close": "You were so close...",
         "magic": ":magic:",
-        "lawsuit": "SEE YOU IN COURT!"
+        "cuic": "SEE YOU IN COURT!"
     },
     "commands": [
         {
@@ -77,6 +78,12 @@
             "args": []
         },
         {
+            "command": "just",
+            "alias": ["j"],
+            "desc": "#Just◯Things",
+            "args": []
+        },
+        {
             "command": "radar",
             "alias": ["r"],
             "desc": "Radar for Penrith, AU.",
@@ -84,7 +91,7 @@
         },
         {
             "command": "exit",
-            "alias": ["gtfo"],
+            "alias": ["gtfo", "fuckoff"],
             "desc": "Unplug the Power",
             "args": [[]]
         }
