@@ -11,10 +11,7 @@ exports.main = (slack, channel, user, args, ts, config) => {
             "username": config.trigger.name,
             "icon_url": config.trigger.icon,
             "channel": channel.id,
-            "attachments": JSON.stringify([{
-                "fallback": text,
-                "text": text,
-            }])
+            "text": text
         }, () => core.delMsg(channel.id, ts));
     }
 };
