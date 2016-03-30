@@ -1,7 +1,7 @@
 {
     "sign": "!",
     "debug": false,
-    "masters": ["U0E56N7UK", "U0E4ZL97H"],
+    "masters": ["U0E4ZL97H"],
     "subprocesses": [
         "fire",
         "quake"
@@ -34,7 +34,10 @@
         "idc": "http://wp.patheos.com.s3.amazonaws.com/blogs/thecrescat/files/2013/09/I-won-t-hear-it-and-I-won-t-respond-to-it-animated-gif-arrested-development-31133206-500-235.gif",
         "both": "https://33.media.tumblr.com/0ae4a458b02b1705c96dd846493e2aad/tumblr_inline_n3ghj9J3u91qcklud.gif",
         "ugh": "https://media0.giphy.com/media/gVoQge4JXndPq/giphy.gif",
-        "facedesk": "http://vignette4.wikia.nocookie.net/r2da/images/0/07/Facedesk.gif"
+        "facedesk": "http://vignette4.wikia.nocookie.net/r2da/images/0/07/Facedesk.gif",
+        "omedetou": "https://i.imgur.com/nTPMCMb.gif",
+        "yokudekimashita": "http://i.imgur.com/ThN5gyr.gif",
+        "nya": "http://i.giphy.com/l2R05KYbshk04bJAI.gif"
     },
     "reacts": {
         "shrug": "¯\\_(ツ)_/¯",
@@ -48,9 +51,9 @@
     },
     "commands": [
         {
-            "command": "test",
+            "command": "translate",
             "alias": ["t"],
-            "desc": "Testing (and usually breaking) things.",
+            "desc": "Better than Rioka",
             "args": []
         },
         {
@@ -80,7 +83,7 @@
         {
             "command": "just",
             "alias": ["j"],
-            "desc": "#Just◯Things",
+            "desc": "#JustBlankThings",
             "args": []
         },
         {
@@ -92,7 +95,7 @@
         {
             "command": "exit",
             "alias": ["gtfo", "fuckoff"],
-            "desc": "Unplug the Power",
+            "desc": "Unplugs the Power",
             "args": [[]]
         }
     ]
