@@ -27,7 +27,7 @@ try {
         if (!(command.args instanceof Array)) wrongType("alias ['alias']", command.command, key);
         if (!(command.args instanceof Array)) wrongType("arguments ['args']", command.command, key);
         _.each(config.subprocesses, (v, key) => {
-            if (typeof v !== "string") wrongType("subprocess ['subprocess']", "subprocesses", key); 
+            if (typeof v !== "string") wrongType("subprocess ['subprocess']", "subprocesses", key);
             if (v.startsWith(config.sign)) crimson.fatal("Unfortunately, commands cannot start with the bot sign due to compatibility reasons.");
         });
         _.each(command.alias, (v, key) => { if (typeof v !== "string") wrongType("alias ['alias']", command.command, key); });
@@ -64,8 +64,14 @@ slack.on("open", () => crimson.nicedebug("Chat has been opened, and messages can
 // Ouch. Disconnected from Slack!
 slack.on("close", () => crimson.warn("Disconnected from Slack."));
 
-// Noooooo!
+// Oh dear
 slack.on("error", (error) => crimson.fatal("A Slack error has occured: " + util.inspect(error)));
+
+// Stupid bullshit things
+slack.on('team_migration_started', () => {
+    crimson.warn('Servers Migrating, Restarting in 5 seconds...');
+    setTimeout(process.exit(0), 5000);
+});
 
 slack.on("message", (data) => {
     // Do not continue if sender is self, or is not a message or a me_message.
@@ -84,7 +90,7 @@ slack.on("message", (data) => {
     if (text.length < 1) return;
 
     // Indicate in console that we've got chat.
-    crimson.info("Message: [" + type + "]<" + channel.name + "> " + user.name + ": " + text);
+    crimson.info("[" + type + "]<" + channel.name + "> " + user.name + ": " + text);
 
     // Begin command checks.
     if (text.startsWith(config.sign) || im) {
@@ -115,8 +121,8 @@ slack.on("message", (data) => {
                         command: originalCommand,
                         masters: config.masters,
                         trigger: {
-                            name: data._client.users[data.user].profile.first_name,
-                            icon: data._client.users[data.user].profile.image_32
+                            name: user.name,
+                            icon: data._client.users[data.user].profile.image_original
                         }
                     };
                     var module = require(path.join(__dirname, "commands", command + ".js"));
@@ -145,7 +151,7 @@ slack.on("message", (data) => {
             slack._apiCall("chat.postMessage", {
                 "as_user": false,
                 "username": user.name,
-                "icon_url": data._client.users[data.user].profile.image_32,
+                "icon_url": data._client.users[data.user].profile.image_original,
                 "channel": channel.id,
                 "text": config.reacts[part]
             });
@@ -161,7 +167,7 @@ slack.on("message", (data) => {
             slack._apiCall("chat.postMessage", {
                 "as_user": false,
                 "username": user.name,
-                "icon_url": data._client.users[data.user].profile.image_32,
+                "icon_url": data._client.users[data.user].profile.image_original,
                 "channel": channel.id,
                 "attachments": JSON.stringify([{
                     "fallback": "<gif>",
