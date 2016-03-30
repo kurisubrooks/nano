@@ -87,7 +87,7 @@ exports.main = (slack, channel, user, args, ts, config) => {
                     "title": location,
                     "mrkdwn_in": ["text"],
                     "text": forecast.join("\n\n"),
-                    "thumb_url": 'https://kurisubrooks.com/static/tenki/day/' + icon + '.png'
+                    "thumb_url": 'https://kurisubrooks.com/static/tenki/day/' + image(icon) + '.png'
                 }])
             }, core.delMsg(channel.id, ts));
         });
