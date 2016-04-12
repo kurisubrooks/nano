@@ -37,7 +37,21 @@
         "facedesk": "http://vignette4.wikia.nocookie.net/r2da/images/0/07/Facedesk.gif",
         "omedetou": "https://i.imgur.com/nTPMCMb.gif",
         "yokudekimashita": "http://i.imgur.com/ThN5gyr.gif",
-        "nya": "http://i.giphy.com/l2R05KYbshk04bJAI.gif"
+        "nya": "http://i.giphy.com/l2R05KYbshk04bJAI.gif",
+        "disgust": "https://media.giphy.com/media/uA7iGzhqHGVtS/giphy.gif",
+        "rekt2": "https://cdn.discordapp.com/attachments/132368736119291904/165653735362658305/giphy.gif",
+        "hungry": "https://media.giphy.com/media/1nfBnMCNoZOWQ/giphy.gif",
+        "cry": "https://media.giphy.com/media/oAW9QPkQwJqJq/giphy.gif",
+        "nosebleed": "https://i.imgur.com/CBceC6Q.gif",
+        "faggot": "https://i.imgur.com/rYOuM0V.gif",
+        "sugoi": "https://i.imgur.com/vSjs9X1.gif",
+        "sad": "https://i.imgur.com/8mKG45J.gif",
+        "hehehe": "https://i.imgur.com/hxiIail.gif",
+        "omg": "https://i.imgur.com/NruwA2a.gif",
+        "weed": "https://i.4cdn.org/v/1459142341927.gif",
+        "magic": "https://media.giphy.com/media/7xp6u50T0Dula/giphy.gif",
+        "murica": "http://i.imgur.com/h0IHHWQ.gif",
+        "banned": "http://i.imgur.com/O3DHIA5.gif"
     },
     "reacts": {
         "shrug": "¯\\_(ツ)_/¯",
@@ -51,9 +65,15 @@
     },
     "commands": [
         {
+            "command": "help",
+            "alias": ["h"],
+            "desc": "Displays the help prompt",
+            "args": []
+        },
+        {
             "command": "translate",
             "alias": ["t"],
-            "desc": "Better than Rioka",
+            "desc": "Translates Query to Given Language",
             "args": []
         },
         {
@@ -71,11 +91,12 @@
         {
             "command": "search",
             "alias": ["s"],
-            "desc": "Search Google",
+            "desc": "Search the Web",
             "args": []
         },
         {
             "command": "say",
+            "hidden": true,
             "alias": ["s"],
             "desc": "Say to chat",
             "args": []
@@ -94,6 +115,7 @@
         },
         {
             "command": "exit",
+            "hidden": true,
             "alias": ["gtfo", "fuckoff"],
             "desc": "Unplugs the Power",
             "args": [[]]
