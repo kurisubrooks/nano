@@ -3,13 +3,14 @@ const path = require('path');
 const config = require('../config.json');
 const core = require('../core.js');
 
-exports.main = (slack, channel, user, args, ts, tears) => {
+exports.main = (slack, channel, user, args, ts, other) => {
     var commands = "*Commands:*\n";
     var reacts = "*Reactions:*\n";
     var gifs = "*GIFs:*\n";
 
     _.forEach(config.commands, (value) => {
-        if (!value.hidden) commands += `\`!${value.command}\`: ${value.desc}\n`;
+        if (value.admin && other.masters.indexOf(other.trigger.id) > -1) commands += `\`!${value.command}\`: ${value.desc} *[ADMIN]*\n`;
+        else if (!value.admin) commands += `\`!${value.command}\`: ${value.desc}\n`;
     });
 
     _.forEach(config.reacts, (value, key) => {
@@ -24,8 +25,8 @@ exports.main = (slack, channel, user, args, ts, tears) => {
         "as_user": true,
         "channel": channel.id,
         "attachments": JSON.stringify([{
-            "author_name": tears.trigger.name,
-            "author_icon": tears.trigger.icon,
+            "author_name": other.trigger.name,
+            "author_icon": other.trigger.icon,
             "color": core.info,
             "mrkdwn_in": ["text"],
             "text": commands + '\n' + reacts + '\n\n' + gifs
