@@ -1,7 +1,7 @@
 {
     "sign": "!",
     "debug": false,
-    "masters": ["U0E4ZL97H"],
+    "masters": ["U0E4ZL97H", "U0E4X3ECB"],
     "subprocesses": [
         "fire",
         "quake"
@@ -66,8 +66,20 @@
     "commands": [
         {
             "command": "help",
-            "alias": ["h"],
+            "alias": ["h", "halp"],
             "desc": "Displays the help prompt",
+            "args": []
+        },
+        {
+            "command": "compute",
+            "alias": ["c"],
+            "desc": "Compute with Wolfram",
+            "args": []
+        },
+        {
+            "command": "romaji",
+            "alias": ["r"],
+            "desc": "Convert Japanese to Romaji",
             "args": []
         },
         {
@@ -96,7 +108,7 @@
         },
         {
             "command": "say",
-            "hidden": true,
+            "admin": true,
             "alias": ["s"],
             "desc": "Say to chat",
             "args": []
@@ -115,7 +127,7 @@
         },
         {
             "command": "exit",
-            "hidden": true,
+            "admin": true,
             "alias": ["gtfo", "fuckoff"],
             "desc": "Unplugs the Power",
             "args": [[]]
