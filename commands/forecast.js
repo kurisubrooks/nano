@@ -31,9 +31,7 @@ exports.main = (slack, channel, user, args, ts, config) => {
         if (body.response.results && body.response.results.length > 1) {
             var places = [];
             _.each(body.response.results, (v) => {
-                var place = "_";
-                if (v.name === v.city) place += v.name;
-                else place = v.name + ", " + v.city;
+                var place = v.name === v.city ? "_" + v.name : v.name + ", " + v.city;
                 if (v.state) place += ", " + v.state;
                 if (v.country_name) place += ", " + v.country_name;
                 place += "_";
