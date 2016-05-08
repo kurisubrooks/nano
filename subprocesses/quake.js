@@ -1,76 +1,89 @@
 const path = require("path");
 const crimson = require("crimson");
 
-latestTS = "";
-latestQuake = "";
+last_ts = "";
+last_quake = "";
 
 exports.main = (slack, config, botdir) => {
     const core = require(path.join(botdir, "core.js"));
     const keychain = require(path.join(botdir, "keychain.js"));
-    const shake = require("socket.io-client")(keychain.shake);
+    const socket = require("socket.io-client")(keychain.shake);
 
-    function kurisu_pls(text) {
+    var channel = "C0E50GQDQ"; // General
+
+    function TO_SLACK(text) {
         slack._apiCall("chat.postMessage", {
             "as_user": true,
-            //"username": "shake",
-            //"icon_url": "http://i.imgur.com/taEr9cQ.png",
-            "channel": "G0KDNTCF3",
+            "channel": "G0KDNTCF3", // Ministry
             "text": text
         });
     }
 
-    shake.on("connect", () => {
-        crimson.success("Connected to Shake.");
-        kurisu_pls("Connected.");
+    socket.on("connect", () => socket.emit("open", { version: 2 }));
+    socket.on("message", (data) => TO_SLACK("Shake > Message from Server: ```" + data + "```"));
+
+    socket.on("auth", (data) => {
+        if (data.ok) {
+            crimson.success("Shake > Connected");
+            TO_SLACK("Shake > Connected");
+        } else {
+            TO_SLACK("Shake > Connection Refused\n```" + data.message + "```");
+            crimson.fatal("Shake > Connection Refused: " + data.message);
+        }
     });
 
-    shake.on("data", data =>
-        run(slack, data));
-
-    shake.on("reconnect", () => {
-        crimson.warn("Connection to Shake was lost, reconnecting...");
-        if (config.debug) kurisu_pls("Reconnecting...");
+    socket.on("quake.eew", (data) => eew(data));
+    socket.on("reconnect", () => crimson.warn("Shake > Reconnecting"));
+    socket.on("disconnect", () => {
+        crimson.error("Shake > Connection Lost");
+        TO_SLACK("Shake > Connection Lost");
     });
 
-    shake.on("disconnect", () => {
-        crimson.error("Connection to Shake was lost!");
-        kurisu_pls("*Error*: Disconnected!");
-    });
+    function eew(data) {
+        var update,
+            template = (data.alarm || data.details.alarm) ? ":bell: Emergency Earthquake Warning" : ":shake: Earthquake Information";
+            data = JSON.parse(data);
 
-    function run(slack, data) {
-        data = JSON.parse(data);
-        var update = "";
+        if (data.situation == 1) update = "Final";
+        else if (data.situation == 2) update = "Cancelled";
+        else update = "#" + data.revision;
 
-        if (Number(data.situation) === 1) update = "Update Final";
-        else if (Number(data.revision) === 1) update = "Epicenter";
-        else update = "Update #" + (Number(data.revision) - 1);
-
-        var attachment = {
+        var attachment = [{
             "color": core.error,
             "mrkdwn_in": ["text"],
-            "fallback": "Earthquake - " + data.epicenter_en + ", Magnitude " + data.magnitude,
-            "title": ":shake: An Earthquake has Occured",
-            "text": "*" + update + ":* " + data.epicenter_en + "\n*Magnitude:* " + data.magnitude + ", *Seismic:* " + data.seismic_en + ", *Depth:* " + data.depth
-        };
+            "fallback": `<Earthquake: ${data.details.epicenter.en}>`,
+            "title": `${template} (${update})`,
+            "text": `*Epicenter:* ${data.details.epicenter.en}\n*Magnitude:* ${data.details.magnitude}, *Max. Seismic:* ${data.details.seismic.en}, *Depth:* ${data.details.depth}km`
+        }];
 
-        if (Number(data.situation) === 1) attachment.image_url = "https://maps.googleapis.com/maps/api/staticmap?center=" + data.latitude + "," + data.longitude + "&zoom=6&size=400x300&format=png&markers=" + data.latitude + "," + data.longitude + "&maptype=roadmap&style=feature:landscape.natural.terrain|hue:0x00ff09|visibility:off&style=feature:transit.line|visibility:off&style=feature:road.highway|visibility:simplified&style=feature:poi|visibility:off&style=feature:administrative.country|visibility:off&style=feature:road|visibility:off";
+        if (data.situation === 1) attachment.image_url = `https://maps.googleapis.com/maps/api/statucmap?center=${data.details.geography.lat},${data.details.geography.long}&zoom=6&size=400x300&format=png&markers=${data.details.geography.lat},${data.details.geography.long}&maptype=roadmap&style=feature:landscape.natural.terrain|hue:0x00ff09|visibility:off&style=feature:transit.line|visibility:off&style=feature:road.highway|visibility:simplified&style=feature:poi|visibility:off&style=feature:administrative.country|visibility:off&style=feature:road|visibility:off`;
 
-        if (latestQuake !== data.earthquake_id) {
-            latestQuake = data.earthquake_id;
+        if (last_quake !== data.id) {
+            last_quake = data.id;
+
             slack._apiCall("chat.postMessage", {
                 "as_user": true,
-                //"username": "shake",
-                //"icon_url": "http://i.imgur.com/taEr9cQ.png",
-                "channel": "C0E50GQDQ",
-                "attachments": JSON.stringify([attachment])
-            }, (data) => latestTS = data.ts);
+                "channel": channel,
+                "text": " ",
+                "attachments": JSON.stringify(attachment)
+            }, (data) => last_ts = data.ts);
+        } else if (data.situation === 2) {
+            attachment.title = "Earthquake Warning Cancelled";
+            attachment.text = "This warning has been cancelled.";
+
+            slack._apiCall("chat.update", {
+                "ts": last_ts,
+                "channel": channel,
+                "text": " ",
+                "attachments": JSON.stringify(attachment)
+            }, (data) => last_ts = data.ts);
         } else {
             slack._apiCall("chat.update", {
-                "ts": this.latestTS,
-                "channel": "C0E50GQDQ",
+                "ts": last_ts,
+                "channel": channel,
                 "text": " ",
-                "attachments": JSON.stringify([attachment])
-            }, (data) => latestTS = data.ts);
+                "attachments": JSON.stringify(attachment)
+            }, (data) => last_ts = data.ts);
         }
     }
 };
