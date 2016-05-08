@@ -6,7 +6,6 @@ const crimson = require("crimson");
 
 const core = require(path.join(__dirname, "core.js"));
 const keychain = require(path.join(__dirname, "keychain.js"));
-const moderate = require(path.join(__dirname, "moderate.json"));
 
 const wrongType = (part, command, key) => crimson.fatal("Incorrect type for " + part + " in command " + command + " at key " + key + ".");
 
@@ -20,13 +19,13 @@ try {
 
     _.each(commands, (command, key) => {
         if (typeof command.command !== "string") crimson.fatal("Missing command name ['command'] at key " + key + ".");
-        if (typeof command.desc !== "string") wrongType("description ['desc']", command.command, key);
+        if (typeof command.desc !== "string")   wrongType("description ['desc']", command.command, key);
         if (!(config.masters instanceof Array)) wrongType("masters ['masters']", command.command, key);
-        if (!(command.args instanceof Array)) wrongType("alias ['alias']", command.command, key);
-        if (!(command.args instanceof Array)) wrongType("arguments ['args']", command.command, key);
+        if (!(command.args instanceof Array))   wrongType("alias ['alias']", command.command, key);
+        if (!(command.args instanceof Array))   wrongType("arguments ['args']", command.command, key);
         _.each(config.subprocesses, (v, key) => {
             if (typeof v !== "string") wrongType("subprocess ['subprocess']", "subprocesses", key);
-            if (v.startsWith(config.sign)) crimson.fatal("Unfortunately, commands cannot start with the bot sign due to compatibility reasons.");
+            if (v.startsWith(config.sign)) crimson.fatal("Commands cannot start with " + config.sign);
         });
         _.each(command.alias, (v, key) => { if (typeof v !== "string") wrongType("alias ['alias']", command.command, key); });
         _.each(command.args, (v, key) => { if (!(v instanceof Array)) wrongType("arguments ['args']", command.command, key); });
@@ -113,8 +112,9 @@ slack.on("message", (data) => {
                         command: originalCommand,
                         masters: config.masters,
                         trigger: {
-                            name: user.name,
                             id: data.user,
+                            username: user.name,
+                            real_name: data._client.users[data.user].profile.real_name,
                             icon: data._client.users[data.user].profile.image_original
                         }
                     });
@@ -132,7 +132,6 @@ slack.on("message", (data) => {
     // For-each every part of the text.
     _.each(text.split(" "), (part) => {
         if (reactOrGifMatched) return false;
-        // If the parts start with the sign, remove the sign and continue, otherwose do not continue.
         if (part.startsWith(config.sign)) part = part.slice(config.sign.length).toLowerCase();
         else return;
 
@@ -147,7 +146,7 @@ slack.on("message", (data) => {
             });
 
             if (text === config.sign + part) core.delMsg(channel.id, ts);
-            reactOrGifMatched = true; // Stop Loop
+            reactOrGifMatched = true;
         }
 
         // GIF Reactions
@@ -164,7 +163,7 @@ slack.on("message", (data) => {
             });
 
             if (text === config.sign + part) core.delMsg(channel.id, ts);
-            reactOrGifMatched = true; // Stop Loop
+            reactOrGifMatched = true;
         }
     });
 });
