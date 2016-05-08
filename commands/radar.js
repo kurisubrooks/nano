@@ -7,7 +7,7 @@ exports.main = (slack, channel, user, args, ts, config) => {
         as_user: true,
         channel: channel.id,
         attachments: JSON.stringify([{
-            "author_name": config.trigger.name,
+            "author_name": config.trigger.real_name,
             "author_icon": config.trigger.icon,
             "color": core.info,
             "fallback": "Here's the radar for Penrith, AU.",

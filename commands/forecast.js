@@ -14,9 +14,9 @@ String.prototype.toUpperLowerCase = function() {
 };
 
 exports.main = (slack, channel, user, args, ts, config) => {
-    if (args.length === 0) args = ['penrith', 'australia'];
+    if (args.length === 0) args = ["penrith", "australia"];
     request.get({url: "https://api.wunderground.com/api/" + keychain.wunderground + "/geolookup/q/" + encodeURIComponent(args.join(" ")) + ".json"}, (error, response) => {
-        if (args.length === 0) args = ['penrith', 'australia'];
+        if (args.length === 0) args = ["penrith", "australia"];
         if (error) {
             channel.send("*Error:* Cannot connect to Wunderground servers.");
             return;
@@ -78,14 +78,14 @@ exports.main = (slack, channel, user, args, ts, config) => {
                 "as_user": true,
                 "channel": channel.id,
                 "attachments": JSON.stringify([{
-                    "author_name": config.trigger.name,
+                    "author_name": config.trigger.real_name,
                     "author_icon": config.trigger.icon,
                     "color": core.info,
-                    "fallback": "Here's the forecast for " + location + ".",
+                    "fallback": "Here\'s the forecast for " + location + ".",
                     "title": location,
                     "mrkdwn_in": ["text"],
                     "text": forecast.join("\n\n"),
-                    "thumb_url": 'https://kurisubrooks.com/static/tenki/day/' + image(icon) + '.png'
+                    "thumb_url": "https://kurisubrooks.com/static/tenki/day/" + image(icon) + ".png"
                 }])
             }, core.delMsg(channel.id, ts));
         });
@@ -95,24 +95,24 @@ exports.main = (slack, channel, user, args, ts, config) => {
 function image(c) {
     console.log(c);
     switch (c) {
-        case 'chanceflurries':  return 'flurry';
-        case 'chancerain':      return 'rain';
-        case 'chancesleat':     return 'sleet';
-        case 'chancesnow':      return 'snow';
-        case 'chancetstorms':   return 'thunderstorm';
-        case 'clear':           return 'clear';
-        case 'cloudy':          return 'cloudy';
-        case 'flurries':        return 'flurry';
-        case 'hazy':            return 'haze';
-        case 'mostlycloudy':    return 'mostly_cloudy';
-        case 'mostlysunny':     return 'mostly_sunny';
-        case 'partlycloudy':    return 'partly_cloudy';
-        case 'partlysunny':     return 'partly_sunny';
-        case 'rain':            return 'rain';
-        case 'sleat':           return 'sleet';
-        case 'snow':            return 'snow';
-        case 'sunny':           return 'sunny';
-        case 'tstorms':         return 'thunderstorm';
-        case 'unknown':         return 'unknown';
+        case "chanceflurries":  return "flurry";
+        case "chancerain":      return "rain";
+        case "chancesleat":     return "sleet";
+        case "chancesnow":      return "snow";
+        case "chancetstorms":   return "thunderstorm";
+        case "clear":           return "clear";
+        case "cloudy":          return "cloudy";
+        case "flurries":        return "flurry";
+        case "hazy":            return "haze";
+        case "mostlycloudy":    return "mostly_cloudy";
+        case "mostlysunny":     return "mostly_sunny";
+        case "partlycloudy":    return "partly_cloudy";
+        case "partlysunny":     return "partly_sunny";
+        case "rain":            return "rain";
+        case "sleat":           return "sleet";
+        case "snow":            return "snow";
+        case "sunny":           return "sunny";
+        case "tstorms":         return "thunderstorm";
+        case "unknown":         return "unknown";
     }
 }

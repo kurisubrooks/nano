@@ -1,7 +1,7 @@
-const _ = require('lodash');
-const path = require('path');
-const config = require('../config.json');
-const core = require('../core.js');
+const _ = require("lodash");
+const path = require("path");
+const config = require("../config.json");
+const core = require("../core.js");
 
 exports.main = (slack, channel, user, args, ts, other) => {
     var commands = "*Commands:*\n";
@@ -25,11 +25,11 @@ exports.main = (slack, channel, user, args, ts, other) => {
         "as_user": true,
         "channel": channel.id,
         "attachments": JSON.stringify([{
-            "author_name": other.trigger.name,
+            "author_name": other.trigger.real_name,
             "author_icon": other.trigger.icon,
             "color": core.info,
             "mrkdwn_in": ["text"],
-            "text": commands + '\n' + reacts + '\n\n' + gifs
+            "text": commands + "\n" + reacts + "\n\n" + gifs
         }])
     }, core.delMsg(channel.id, ts));
 };

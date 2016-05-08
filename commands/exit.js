@@ -7,16 +7,14 @@ exports.main = (slack, channel, user, args, ts, config) => {
             "as_user": true,
             "channel": channel.id,
             "attachments": JSON.stringify([{
-                "author_name": config.trigger.name,
+                "author_name": config.trigger.real_name,
                 "author_icon": config.trigger.icon,
                 "fallback": "brb",
                 "image_url": "http://i.imgur.com/kiKRmYY.gif"
             }])
         }, () => {
             core.delMsg(channel.id, ts);
-            setTimeout(() => process.exit(0), 2000);
+            setTimeout(() => process.exit(0), 1000);
         });
-    }
-
-    else channel.send("お前は博士じゃない！");
+    } else channel.send("Insufficient Permissions to use this command");
 };

@@ -23,23 +23,21 @@ exports.main = (slack, channel, user, args, ts, config) => {
                         thumb_url = result.items[0].pagemap.cse_thumbnail[0].src;
                     } else thumb_url = "";
 
-                    var attachments = [{
-                        "author_name": config.trigger.name,
-                        "author_icon": config.trigger.icon,
-                        "fallback": "Here\"s what I found:",
-                        "color": core.info,
-                        "title": result.items[0].title,
-                        "title_link": result.items[0].link,
-                        "text": result.items[0].snippet + "\n" + "<" + decodeURIComponent(result.items[0].link) + ">",
-                        "thumb_url": thumb_url
-                    }];
-
                     slack._apiCall("chat.postMessage", {
                         as_user: true,
                         unfurl_links: false,
                         unfurl_media: false,
                         channel: channel.id,
-                        attachments: JSON.stringify(attachments)
+                        attachments: JSON.stringify([{
+                            "author_name": config.trigger.real_name,
+                            "author_icon": config.trigger.icon,
+                            "fallback": "Here\"s what I found:",
+                            "color": core.info,
+                            "title": result.items[0].title,
+                            "title_link": result.items[0].link,
+                            "text": result.items[0].snippet + "\n" + "<" + decodeURIComponent(result.items[0].link) + ">",
+                            "thumb_url": thumb_url
+                        }])
                     }, core.delMsg(channel.id, ts));
                 }
 
