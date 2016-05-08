@@ -3,8 +3,8 @@
     "debug": false,
     "masters": ["U0E4ZL97H", "U0E4X3ECB"],
     "subprocesses": [
-        "fire",
-        "quake"
+        "quake",
+        "fire"
     ],
     "gifs": {
         "facepalm": "https://media.giphy.com/media/8BYLSNmnJYQxy/giphy.gif",
@@ -51,7 +51,8 @@
         "weed": "https://i.4cdn.org/v/1459142341927.gif",
         "magic": "https://media.giphy.com/media/7xp6u50T0Dula/giphy.gif",
         "murica": "http://i.imgur.com/h0IHHWQ.gif",
-        "banned": "http://i.imgur.com/O3DHIA5.gif"
+        "banned": "http://i.imgur.com/O3DHIA5.gif",
+        "makise": "http://img.mrdrsr.net/kurisu-dealwithit.gif"
     },
     "reacts": {
         "shrug": "¯\\_(ツ)_/¯",
@@ -61,25 +62,14 @@
         "nbc": ":stars: *NBC*\n_the more you know_",
         "close": "You were so close...",
         "magic": ":magic:",
-        "cuic": "SEE YOU IN COURT!"
+        "cuic": "SEE YOU IN COURT!",
+        "test": "Test Received."
     },
     "commands": [
         {
             "command": "help",
             "alias": ["h", "halp"],
             "desc": "Displays the help prompt",
-            "args": []
-        },
-        {
-            "command": "compute",
-            "alias": ["c"],
-            "desc": "Compute with Wolfram",
-            "args": []
-        },
-        {
-            "command": "romaji",
-            "alias": ["r"],
-            "desc": "Convert Japanese to Romaji",
             "args": []
         },
         {
