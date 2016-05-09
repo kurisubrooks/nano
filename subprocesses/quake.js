@@ -40,23 +40,25 @@ exports.main = (slack, config, botdir) => {
     });
 
     function eew(data) {
-        var update,
-            template = (data.alarm || data.details.alarm) ? ":bell: Emergency Earthquake Warning" : ":shake: Earthquake Information";
-            data = JSON.parse(data);
+        var update;
+        var template = (data.alarm) ? ":bell: Emergency Earthquake Warning" : ":shake: Earthquake Information";
+            data = (typeof data === "object") ? data : JSON.parse(data);
 
         if (data.situation == 1) update = "Final";
         else if (data.situation == 2) update = "Cancelled";
         else update = "#" + data.revision;
 
-        var attachment = [{
+        var attachments = [{
             "color": core.error,
             "mrkdwn_in": ["text"],
             "fallback": `<Earthquake: ${data.details.epicenter.en}>`,
             "title": `${template} (${update})`,
-            "text": `*Epicenter:* ${data.details.epicenter.en}\n*Magnitude:* ${data.details.magnitude}, *Max. Seismic:* ${data.details.seismic.en}, *Depth:* ${data.details.depth}km`
+            "text": `*Epicenter:* ${data.details.epicenter.en}\n*Magnitude:* ${data.details.magnitude}, *Max. Seismic:* ${data.details.seismic.en}, *Depth:* ${data.details.geography.depth}km`
         }];
 
-        if (data.situation === 1) attachment.image_url = `https://maps.googleapis.com/maps/api/statucmap?center=${data.details.geography.lat},${data.details.geography.long}&zoom=6&size=400x300&format=png&markers=${data.details.geography.lat},${data.details.geography.long}&maptype=roadmap&style=feature:landscape.natural.terrain|hue:0x00ff09|visibility:off&style=feature:transit.line|visibility:off&style=feature:road.highway|visibility:simplified&style=feature:poi|visibility:off&style=feature:administrative.country|visibility:off&style=feature:road|visibility:off`;
+        if (data.situation === 1) attachments.image_url = `https://maps.googleapis.com/maps/api/statucmap?center=${data.details.geography.lat},${data.details.geography.long}&zoom=6&size=400x300&format=png&markers=${data.details.geography.lat},${data.details.geography.long}&maptype=roadmap&style=feature:landscape.natural.terrain|hue:0x00ff09|visibility:off&style=feature:transit.line|visibility:off&style=feature:road.highway|visibility:simplified&style=feature:poi|visibility:off&style=feature:administrative.country|visibility:off&style=feature:road|visibility:off`;
+
+        if (data.alarm) attachments.text += "\n@kurisu @justin @kaori";
 
         if (last_quake !== data.id) {
             last_quake = data.id;
@@ -65,24 +67,24 @@ exports.main = (slack, config, botdir) => {
                 "as_user": true,
                 "channel": channel,
                 "text": " ",
-                "attachments": JSON.stringify(attachment)
+                "attachments": JSON.stringify(attachments)
             }, (data) => last_ts = data.ts);
         } else if (data.situation === 2) {
-            attachment.title = "Earthquake Warning Cancelled";
-            attachment.text = "This warning has been cancelled.";
+            attachments.title = "Earthquake Warning Cancelled";
+            attachments.text = "This warning has been cancelled.";
 
             slack._apiCall("chat.update", {
                 "ts": last_ts,
                 "channel": channel,
                 "text": " ",
-                "attachments": JSON.stringify(attachment)
+                "attachments": JSON.stringify(attachments)
             }, (data) => last_ts = data.ts);
         } else {
             slack._apiCall("chat.update", {
                 "ts": last_ts,
                 "channel": channel,
                 "text": " ",
-                "attachments": JSON.stringify(attachment)
+                "attachments": JSON.stringify(attachments)
             }, (data) => last_ts = data.ts);
         }
     }
