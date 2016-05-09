@@ -4,6 +4,7 @@
     "masters": ["U0E4ZL97H", "U0E4X3ECB"],
     "subprocesses": [
         "quake",
+        "shibe",
         "fire"
     ],
     "gifs": {

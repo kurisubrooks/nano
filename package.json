@@ -10,6 +10,7 @@
     "kuroshiro": "^0.1.1",
     "lodash": "^4.0.1",
     "moment": "^2.11.2",
+    "node-tweet-stream": "^1.10.0",
     "qs": "^6.1.0",
     "request": "^2.69.0",
     "slack-client": "^1.5.1",
