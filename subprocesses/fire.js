@@ -1,5 +1,4 @@
 const path = require("path");
-const crimson = require("crimson");
 const request = require("request");
 const _ = require("lodash");
 const XML = require("xml2js");
