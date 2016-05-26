@@ -27,6 +27,7 @@ exports.main = (slack, channel, user, args, ts, other) => {
         "attachments": JSON.stringify([{
             "author_name": other.trigger.real_name,
             "author_icon": other.trigger.icon,
+            "fallback": "You need help? What about me! *sobs*",
             "color": core.info,
             "mrkdwn_in": ["text"],
             "text": commands + "\n" + reacts + "\n\n" + gifs
