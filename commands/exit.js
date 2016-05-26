@@ -16,5 +16,5 @@ exports.main = (slack, channel, user, args, ts, config) => {
             core.delMsg(channel.id, ts);
             setTimeout(() => process.exit(0), 1000);
         });
-    } else channel.send("Insufficient Permissions to use this command");
+    } else channel.send(core.error("exit", "Insufficient Permissions"));
 };

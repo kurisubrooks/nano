@@ -16,11 +16,11 @@ exports.main = (slack, config, botdir) => {
             "as_user": true,
             "channel": "G0KDNTCF3", // #Ministry
             "attachments": JSON.stringify([{
-                "color": core.error,
+                "color": core.danger,
                 "mrkdwn_in": ["text"],
                 "title": "An fire has occurred in subprocess 'fire':",
                 "fallback": "<Error>",
-                "text": "Error was thrown from `" + from + "`\n```" + message + "```"
+                "text": core.error(from, message)
             }])
         });
 
@@ -29,9 +29,11 @@ exports.main = (slack, config, botdir) => {
 
     function check() {
         request(url, function (err, res, out) {
-            if (err) error("request", err);
-            else if (out === undefined) error("request", "Response:\n" + out + "\n\nStatus Code: " + res.statusCode);
-            else {
+            if (err) {
+                error("request", err);
+            } else if (out === undefined) {
+                error("request", "Response:\n" + out + "\n\nStatus Code: " + res.statusCode);
+            } else {
                 parser.parseString(out, (error, response) => {
                     if (error) error("parser.parseString", error);
                     if (response === undefined || res.statusCode !== 200)
@@ -46,7 +48,7 @@ exports.main = (slack, config, botdir) => {
                             "as_user": true,
                             "channel": "C16MCPJ23", // #Bots
                             "attachments": JSON.stringify([{
-                                "color": core.error,
+                                "color": core.danger,
                                 "mrkdwn_in": ["text"],
                                 "title": ":fire: NSW RFS Alert",
                                 "fallback": "An RFS Fire Alert has been issued.",
