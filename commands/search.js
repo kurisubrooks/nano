@@ -1,4 +1,4 @@
-const http = require("https");
+const request = require("request");
 const path = require("path");
 const core = require(path.join(__dirname, "../", "core.js"));
 const keychain = require(path.join(__dirname, "../", "keychain.js"));
@@ -6,55 +6,41 @@ const keychain = require(path.join(__dirname, "../", "keychain.js"));
 exports.main = (slack, channel, user, args, ts, config) => {
     var url = "https://www.googleapis.com/customsearch/v1?key=" + keychain.google + "&num=1&cx=006735756282586657842:s7i_4ej9amu&q=" + encodeURIComponent(args.join(" "));
 
-    http.get(url, (res) => {
-        if (res.statusCode == 200) {
-            var data = "";
-            var thumb_url = "";
+    request(url, function(err, res, body) {
+        if (err) {
+            channel.send(core.error("search", err));
+            return;
+        } else if (res.statusCode == 200) {
+            var data = (typeof data === "object") ? body : JSON.parse(body);
 
-            res.on("data", (chunk) => data += chunk);
-            res.on("end", () => {
-                var result = JSON.parse(data);
-                if (result.searchInformation.totalResults != "0") {
-                    var search_user = "<@" + user.name + ">";
-                    var search_link = result.items[0].link;
-                    var search_snip = result.items[0].snippet;
+            if (data.searchInformation.totalResults !== "0") {
+                var result = data.items[0];
 
-                    if ("pagemap" in result.items[0] && "cse_thumbnail" in result.items[0].pagemap) {
-                        thumb_url = result.items[0].pagemap.cse_thumbnail[0].src;
-                    } else thumb_url = "";
-
-                    slack._apiCall("chat.postMessage", {
-                        as_user: true,
-                        unfurl_links: false,
-                        unfurl_media: false,
-                        channel: channel.id,
-                        attachments: JSON.stringify([{
-                            "author_name": config.trigger.real_name,
-                            "author_icon": config.trigger.icon,
-                            "fallback": "Here\"s what I found:",
-                            "color": core.info,
-                            "title": result.items[0].title,
-                            "title_link": result.items[0].link,
-                            "text": result.items[0].snippet + "\n" + "<" + decodeURIComponent(result.items[0].link) + ">",
-                            "thumb_url": thumb_url
-                        }])
-                    }, core.delMsg(channel.id, ts));
-                }
-
-                else {
-                    channel.send("*Error:* The search returned no results.");
-                }
-            });
+                slack._apiCall("chat.postMessage", {
+                    "as_user": true,
+                    "channel": channel.id,
+                    "unfurl_links": false,
+                    "unfurl_media": false,
+                    "attachments": JSON.stringify([{
+                        "author_name": config.trigger.real_name,
+                        "author_icon": config.trigger.icon,
+                        "fallback": config.trigger.username + ": Here\'s the result of your search",
+                        "color": core.info,
+                        "title": result.title,
+                        "title_link": result.link,
+                        "text": result.snippet + "\n" + "<" + decodeURIComponent(result.link) + ">",
+                        "thumb_url": (result.pagemap && result.pagemap.cse_thumbnail) ? result.pagemap.cse_thumbnail[0].src : ""
+                    }])
+                }, core.delMsg(channel.id, ts));
+            }
+        } else if (res.statusCode != 200){
+            if (res.statusCode == 403) {
+                channel.send(core.error("search", "Exceeded Maximum Daily API Call Limit"));
+            } else if (res.statusCode == 500) {
+                channel.send(core.error("search", "Unknown Error Occurred"));
+            } else {
+                channel.send(core.error("search", "Unknown Error Occurred - " + res.statusCode));
+            }
         }
-
-        else if (res.statusCode != 200){
-            if (res.statusCode == 403) channel.send("*Error*: Exceeded Maximum daily API calls.");
-            else if (res.statusCode == 500) channel.send("*Error*: An unknown error has occurred.");
-            else channel.send("*Error*: Unknown error, #*" + res.statusCode + "*");
-        }
-    })
-
-    .on("error", (error) => {
-        channel.send(core.errno + "```" + error + "```");
     });
 };
