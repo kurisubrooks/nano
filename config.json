@@ -38,10 +38,10 @@
         "ugh": "https://media0.giphy.com/media/gVoQge4JXndPq/giphy.gif",
         "facedesk": "http://vignette4.wikia.nocookie.net/r2da/images/0/07/Facedesk.gif",
         "omedetou": "https://i.imgur.com/nTPMCMb.gif",
-        "yokudekimashita": "http://i.imgur.com/ThN5gyr.gif",
-        "nya": "http://i.giphy.com/l2R05KYbshk04bJAI.gif",
+        "yokudekimashita": "https://i.imgur.com/ThN5gyr.gif",
+        "nya": "https://i.giphy.com/l2R05KYbshk04bJAI.gif",
         "disgust": "https://media.giphy.com/media/uA7iGzhqHGVtS/giphy.gif",
-        "rekt2": "http://i.imgur.com/ITkviz6.gif",
+        "rekt2": "https://i.imgur.com/ITkviz6.gif",
         "hungry": "https://media.giphy.com/media/1nfBnMCNoZOWQ/giphy.gif",
         "cry": "https://media.giphy.com/media/oAW9QPkQwJqJq/giphy.gif",
         "nosebleed": "https://i.imgur.com/CBceC6Q.gif",
@@ -51,9 +51,13 @@
         "hehehe": "https://i.imgur.com/hxiIail.gif",
         "omg": "https://i.imgur.com/NruwA2a.gif",
         "magic": "https://media.giphy.com/media/7xp6u50T0Dula/giphy.gif",
-        "murica": "http://i.imgur.com/h0IHHWQ.gif",
-        "banned": "http://i.imgur.com/O3DHIA5.gif",
-        "makise": "http://img.mrdrsr.net/kurisu-dealwithit.gif"
+        "murica": "https://i.imgur.com/h0IHHWQ.gif",
+        "banned": "https://i.imgur.com/O3DHIA5.gif",
+        "makise": "http://img.mrdrsr.net/kurisu-dealwithit.gif",
+        "eee": "https://i.imgur.com/s79Fr1Z.jpg",
+        "triggered": "https://i.imgur.com/MwBrt7g.jpg",
+        "gotcha": "https://i.imgur.com/pP4X6uz.gif",
+        "dying": "https://i.imgur.com/88alCjs.gif"
     },
     "reacts": {
         "shrug": "¯\\_(ツ)_/¯",
@@ -70,7 +74,7 @@
     "commands": [
         {
             "command": "help",
-            "alias": ["h", "halp"],
+            "alias": ["h", "halp", "tasukete"],
             "desc": "Displays the help prompt",
             "args": []
         },
