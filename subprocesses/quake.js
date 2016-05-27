@@ -48,54 +48,68 @@ exports.main = (slack, config, botdir) => {
         else if (data.situation === 2) update = "Cancelled";
         else update = "#" + data.revision;
 
-        var attachments = [{
-            "color": core.danger,
-            "mrkdwn_in": ["text"],
-            "fallback": `<Earthquake: ${data.details.epicenter.en}>`,
-            "title": `${template} (${update})`,
-            "text": `*Epicenter:* ${data.details.epicenter.en}\n*Magnitude:* ${data.details.magnitude}, *Max. Seismic:* ${data.details.seismic.en}, *Depth:* ${data.details.geography.depth}km`
-        }];
-
-        if (data.alarm) attachments.text += "\n*Alert:* <@kurisu> <@justin> <@kaori>";
-
         if (last_quake != data.id) {
             last_quake = data.id;
-            setTimeout(function() {
-                post(attachments);
-            }, 10);
+            
+            // New Warning
+            slack._apiCall("chat.postMessage", {
+                "as_user": true,
+                "channel": channel,
+                "text": " ",
+                "attachments": JSON.stringify([{
+                    "color": core.danger,
+                    "mrkdwn_in": ["text"],
+                    "fallback": `<Earthquake: ${data.details.epicenter.en}>`,
+                    "title": `${template} (${update})`,
+                    "text": `*Epicenter:* ${data.details.epicenter.en}\n*Magnitude:* ${data.details.magnitude}, *Max. Seismic:* ${data.details.seismic.en}, *Depth:* ${data.details.geography.depth}km`
+                }])
+            }, (data) => last_ts = data.ts);
         } else if (data.situation === 1) {
-            attachments.image_url = `https://maps.googleapis.com/maps/api/statucmap?center=${data.details.geography.lat},${data.details.geography.long}&zoom=6&size=400x300&format=png&markers=${data.details.geography.lat},${data.details.geography.long}&maptype=roadmap&style=feature:landscape.natural.terrain|hue:0x00ff09|visibility:off&style=feature:transit.line|visibility:off&style=feature:road.highway|visibility:simplified&style=feature:poi|visibility:off&style=feature:administrative.country|visibility:off&style=feature:road|visibility:off`;
             setTimeout(function() {
-                update(attachments);
+                slack._apiCall("chat.update", {
+                    "ts": last_ts,
+                    "channel": channel,
+                    "text": " ",
+                    "attachments": JSON.stringify([{
+                        "color": core.danger,
+                        "mrkdwn_in": ["text"],
+                        "fallback": `<Earthquake: ${data.details.epicenter.en}>`,
+                        "title": `${template} (${update})`,
+                        "text": `*Epicenter:* ${data.details.epicenter.en}\n*Magnitude:* ${data.details.magnitude}, *Max. Seismic:* ${data.details.seismic.en}, *Depth:* ${data.details.geography.depth}km`,
+                        "image_url": `https://maps.googleapis.com/maps/api/staticmap?center=${data.details.geography.lat},${data.details.geography.long}&zoom=6&size=400x300&format=png&markers=${data.details.geography.lat},${data.details.geography.long}&maptype=roadmap&style=feature:landscape.natural.terrain|hue:0x00ff09|visibility:off&style=feature:transit.line|visibility:off&style=feature:road.highway|visibility:simplified&style=feature:poi|visibility:off&style=feature:administrative.country|visibility:off&style=feature:road|visibility:off`
+                    }])
+                }, (data) => last_ts = data.ts);
             }, 100);
         } else if (data.situation === 2) {
-            attachments.title = "Earthquake Warning Cancelled";
-            attachments.text = "This warning has been cancelled.";
             setTimeout(function() {
-                update(attachments);
+                slack._apiCall("chat.update", {
+                    "ts": last_ts,
+                    "channel": channel,
+                    "text": " ",
+                    "attachments": JSON.stringify([{
+                        "color": core.danger,
+                        "mrkdwn_in": ["text"],
+                        "fallback": `<Earthquake Warning Cancelled>`,
+                        "title": `Earthquake Warning Cancelled`,
+                        "text": `This warning has been cancelled.`
+                    }])
+                }, (data) => last_ts = data.ts);
             }, 100);
         } else {
             setTimeout(function() {
-                update(attachments);
+                slack._apiCall("chat.update", {
+                    "ts": last_ts,
+                    "channel": channel,
+                    "text": " ",
+                    "attachments": JSON.stringify([{
+                        "color": core.danger,
+                        "mrkdwn_in": ["text"],
+                        "fallback": `<Earthquake: ${data.details.epicenter.en}>`,
+                        "title": `${template} (${update})`,
+                        "text": `*Epicenter:* ${data.details.epicenter.en}\n*Magnitude:* ${data.details.magnitude}, *Max. Seismic:* ${data.details.seismic.en}, *Depth:* ${data.details.geography.depth}km`
+                    }])
+                }, (data) => last_ts = data.ts);
             }, 100);
         }
-    }
-
-    function post(attachments) {
-        slack._apiCall("chat.postMessage", {
-            "as_user": true,
-            "channel": channel,
-            "text": " ",
-            "attachments": JSON.stringify(attachments)
-        }, (data) => last_ts = data.ts);
-    }
-
-    function update(attachments) {
-        slack._apiCall("chat.update", {
-            "ts": last_ts,
-            "channel": channel,
-            "text": " ",
-            "attachments": JSON.stringify(attachments)
-        }, (data) => last_ts = data.ts);
     }
 };
