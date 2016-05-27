@@ -6,13 +6,6 @@ const keychain = require(path.join(__dirname, "../", "keychain.js"));
 
 const util = require("util");
 
-// Do not change this to ES6, does not work then.
-String.prototype.toUpperLowerCase = function() {
-    var string = this.split("");
-    string[0] = string[0].toUpperCase();
-    return string.join("");
-};
-
 exports.main = (slack, channel, user, args, ts, config) => {
     if (args.length === 0) args = ["penrith", "australia"];
     request.get({url: "https://api.wunderground.com/api/" + keychain.wunderground + "/geolookup/q/" + encodeURIComponent(args.join(" ")) + ".json"}, (error, response) => {

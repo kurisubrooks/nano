@@ -20,3 +20,13 @@ exports.delMsg = function(channel, timestamp) {
 exports.error = function(module, message) {
     return "*Error:* An error was thrown from " + module + ".js\n```" + message + "```";
 };
+
+String.prototype.toUpperLowerCase = function() {
+    var string = this.split("");
+    string[0] = string[0].toUpperCase();
+    return string.join("");
+};
+
+String.prototype.firstUpper = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
