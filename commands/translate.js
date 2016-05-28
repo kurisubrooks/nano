@@ -2,94 +2,61 @@ const path = require("path");
 const core = require(path.join(__dirname, "../", "core.js"));
 const keychain = require(path.join(__dirname, "../", "keychain.js"));
 const request = require("request");
-const wanakana = require("wanakana");
+const hepburn = require("hepburn");
+const xml = require("xml2js");
+const xmlp = new xml.Parser();
 const qs = require("qs");
 const _ = require("lodash");
-const url = keychain.translate;
 
-var langs = {
-    // a
-    "af": "Afrikaans",
-    "ar": "Arabic",
-    // b
-    "bg": "Bulgarian",
-    // c
-    "cs": "Czech",
-    // d
-    "da": "Danish",
-    "de": "German",
-    // e
-    "el": "Greek",
-    "en": "English",
-    "es": "Spanish",
-    // f
-    "fa": "Persian",
-    "fi": "Finnish",
-    "fj": "Fijian",
-    "fr": "French",
-    // g
-    // h
-    "he": "Hebrew",
-    "hi": "Hindi",
-    "hr": "Croatian",
-    "hu": "Hungarian",
-    "hy": "Armenian",
-    // i
-    "id": "Indonesian",
-    "is": "Icelandic",
-    "it": "Italian",
-    // j
-    "ja": "Japanese",
-    // k
-    "ka": "Georgian",
-    "ko": "Korean",
-    // l
-    "la": "Latin",
-    "lo": "Lao",
-    "lt": "Lithuanian",
-    // m
-    "mi": "Māori",
-    "mk": "Macedonian",
-    "ms": "Malay",
-    // n
-    "nl": "Dutch",
-    "no": "Norwegian",
-    // o
-    // p
-    "pa": "Punjabi",
-    "pl": "Polish",
-    "pt": "Portuguese",
-    // q
-    // r
-    "ro": "Romanian",
-    "ru": "Russian",
-    // s
-    "sk": "Slovak",
-    "sm": "Samoan",
-    "sr": "Serbian",
-    "sv": "Swedish",
-    // t
-    "ta": "Tamil",
-    "th": "Thai",
-    "tl": "Filipino",
-    "to": "Tongan",
-    "tr": "Turkish",
-    // u
-    "uk": "Ukranian",
-    // v
-    "vi": "Vietnamese",
-    // w
-    "cy": "Welsh",
-    // x
-    // y
-    // z
-    "zh": "Chinese (Traditional)",
-    "zh-cn": "Chinese",
-    "zh-tw": "Chinese (Traditional)",
-    "zu": "Zulu"
-};
+function romaji(input) {
+    var options = {
+        headers: { "User-Agent": "Mozilla/5.0" },
+        url: "http://jlp.yahooapis.jp/FuriganaService/V1/furigana",
+        form: {
+            appid: keychain.yahoojp,
+            sentence: input
+        }
+    };
+
+    return new Promise((resolve, reject) => {
+        request.post(options, function(e, r, b) {
+            if (e) reject(e);
+            if (b !== undefined) {
+                xmlp.parseString(b, function(err, res) {
+                    if (err) reject(err);
+                    if (res !== undefined) {
+                        var output = [];
+
+                        _.forEach(res.ResultSet.Result[0].WordList[0].Word, (val) => {
+                            if (val.Roman) {
+                                if (val.Roman[0] == " ") return;
+                                output.push(val.Roman[0].replace(/ha/g, "wa"));
+                            } else if (val.Surface) {
+                                if (val.Surface[0] == " ") return;
+                                output.push(val.Surface[0]);
+                            }
+                        });
+
+                        resolve(output);
+                    }
+                });
+            }
+        });
+    });
+}
 
 function check_iso(lang) {
+    var langs = {
+        "af": "Afrikaans", "ar": "Arabic", "bg": "Bulgarian", "cs": "Czech", "da": "Danish", "de": "German", "el": "Greek",
+        "en": "English", "es": "Spanish", "fa": "Persian", "fi": "Finnish", "fj": "Fijian", "fr": "French", "he": "Hebrew",
+        "hi": "Hindi", "hr": "Croatian", "hu": "Hungarian", "hy": "Armenian", "id": "Indonesian", "is": "Icelandic",
+        "it": "Italian", "ja": "Japanese", "ka": "Georgian", "ko": "Korean", "la": "Latin", "lo": "Lao", "lt": "Lithuanian",
+        "mi": "Māori", "mk": "Macedonian", "ms": "Malay", "nl": "Dutch", "no": "Norwegian", "pa": "Punjabi", "pl": "Polish",
+        "pt": "Portuguese", "ro": "Romanian", "ru": "Russian", "sk": "Slovak", "sm": "Samoan", "sr": "Serbian", "sv": "Swedish",
+        "ta": "Tamil", "th": "Thai", "tl": "Filipino", "to": "Tongan", "tr": "Turkish", "uk": "Ukranian", "vi": "Vietnamese",
+        "cy": "Welsh", "zh": "Chinese (Traditional)", "zh-cn": "Chinese", "zh-tw": "Chinese (Traditional)", "zu": "Zulu"
+    };
+
     lang = lang.toLowerCase();
     if (lang in langs) return langs[lang];
     else return lang;
@@ -111,13 +78,12 @@ exports.main = (slack, channel, user, args, ts, config) => {
 
     var fetch = {
         headers: { "User-Agent": "Mozilla/5.0" },
-        url: url + qs.stringify({
-            // sl: from language
-            sl: frlang,
-            // tl: to language
-            tl: tolang,
-            // q:  translation query
-            q: translate
+        url: keychain.translate + qs.stringify({
+            dt: "t", // data type
+            client: "gtx", // client type
+            sl: frlang, // from language
+            tl: tolang, // to language
+            q: translate // query
         })
     };
 
@@ -139,6 +105,7 @@ exports.main = (slack, channel, user, args, ts, config) => {
         var query       = (typeof response[0][0][1] === "string") ? response[0][0][1] : translate;
         var from_lang   = response[1];
         var to_lang     = tolang;
+        var to_roma     = (tolang == "ja") ? translation : query ;
 
         var from_fancy = check_iso(from_lang);
         var to_fancy   = check_iso(to_lang);
@@ -146,55 +113,32 @@ exports.main = (slack, channel, user, args, ts, config) => {
 
         if (response[3]) {
             if (response[3][0]) {
-                _.each(response[3][0], function(value) {
+                _.forEach(response[3][0], function(value) {
                     other += check_iso(value);
                 });
             }
         }
 
-        /*
-        console.log("Response: " + body.replace(/\,+/g, ","));
-        console.log("Query: " + query);
-        console.log("Translation: " + translation.firstUpper());
-        console.log("From: " + from_fancy);
-        console.log("To: " + to_fancy);
-        console.log("Languages: " + other);
-        console.log("Romaji1: " + wanakana.toRomaji(query));
-        console.log("Romaji2: " + wanakana.toRomaji(translation));
-        */
+        var format = [`*${from_fancy}:* ${query}`, `*${to_fancy}:* ${translation.firstUpper()}`];
 
-        var format = "";
-        var format_roma = "";
-        var format_from = `*${from_fancy}:* ${query}`;
-        var format_to   = `*${to_fancy}:* ${translation.firstUpper()}`;
+        romaji(to_roma).then((furigana) => {
+            var format_roma = `*Romaji:* ${hepburn.cleanRomaji(furigana.join(" ")).toLowerCase().replace(/thi/g, "ti")}`;
 
-        if (from_lang === "ja") format_roma = `*Romaji:* ${wanakana.toRomaji(query)}`;
-        else if (to_lang === "ja") format_roma = `*Romaji:* ${wanakana.toRomaji(translation)}`;
+            if (from_lang === "ja") format.splice(1, 0, format_roma);
+            else if (to_lang === "ja") format.push(format_roma);
 
-        if (from_lang === "ja") {
-            format += format_from + "\n";
-            format += format_roma + "\n";
-            format += format_to;
-        } else if (to_lang === "ja") {
-            format += format_from + "\n";
-            format += format_to + "\n";
-            format += format_roma;
-        } else {
-            format += format_from + "\n";
-            format += format_to;
-        }
-
-        slack._apiCall("chat.postMessage", {
-            as_user: true,
-            channel: channel.id,
-            attachments: JSON.stringify([{
-                "author_name": config.trigger.real_name,
-                "author_icon": config.trigger.icon,
-                "fallback": query + " > " + translation.toUpperLowerCase(),
-                "mrkdwn_in": ["text"],
-                "color": core.info,
-                "text": format
-            }])
-        }, core.delMsg(channel.id, ts));
+            slack._apiCall("chat.postMessage", {
+                as_user: true,
+                channel: channel.id,
+                attachments: JSON.stringify([{
+                    "author_name": config.trigger.real_name,
+                    "author_icon": config.trigger.icon,
+                    "fallback": query + " > " + translation.toUpperLowerCase(),
+                    "mrkdwn_in": ["text"],
+                    "color": core.info,
+                    "text": format.join("\n")
+                }])
+            }, core.delMsg(channel.id, ts));
+        });
     });
 };
