@@ -121,12 +121,27 @@ exports.main = (slack, channel, user, args, ts, config) => {
 
         var format = [`*${from_fancy}:* ${query}`, `*${to_fancy}:* ${translation.firstUpper()}`];
 
-        romaji(to_roma).then((furigana) => {
-            var format_roma = `*Romaji:* ${hepburn.cleanRomaji(furigana.join(" ")).toLowerCase().replace(/thi/g, "ti")}`;
+        if (to_lang == "ja" || from_lang == "ja") {
+            romaji(to_roma).then((furigana) => {
+                var format_roma = `*Romaji:* ${hepburn.cleanRomaji(furigana.join(" ")).toLowerCase().replace(/thi/g, "ti")}`;
 
-            if (from_lang === "ja") format.splice(1, 0, format_roma);
-            else if (to_lang === "ja") format.push(format_roma);
+                if (from_lang === "ja") format.splice(1, 0, format_roma);
+                else if (to_lang === "ja") format.push(format_roma);
 
+                slack._apiCall("chat.postMessage", {
+                    as_user: true,
+                    channel: channel.id,
+                    attachments: JSON.stringify([{
+                        "author_name": config.trigger.real_name,
+                        "author_icon": config.trigger.icon,
+                        "fallback": query + " > " + translation.toUpperLowerCase(),
+                        "mrkdwn_in": ["text"],
+                        "color": core.info,
+                        "text": format.join("\n")
+                    }])
+                }, core.delMsg(channel.id, ts));
+            });
+        } else {
             slack._apiCall("chat.postMessage", {
                 as_user: true,
                 channel: channel.id,
@@ -139,6 +154,6 @@ exports.main = (slack, channel, user, args, ts, config) => {
                     "text": format.join("\n")
                 }])
             }, core.delMsg(channel.id, ts));
-        });
+        }
     });
 };
