@@ -8,7 +8,7 @@ const xmlp = new xml.Parser();
 const qs = require("qs");
 const _ = require("lodash");
 
-function romaji(input) {
+function romaji(input, channel) {
     var options = {
         headers: { "User-Agent": "Mozilla/5.0" },
         url: "http://jlp.yahooapis.jp/FuriganaService/V1/furigana",
@@ -27,15 +27,21 @@ function romaji(input) {
                     if (res !== undefined) {
                         var output = [];
 
-                        _.forEach(res.ResultSet.Result[0].WordList[0].Word, (val) => {
-                            if (val.Roman) {
-                                if (val.Roman[0] == " ") return;
-                                output.push(val.Roman[0].replace(/ha/g, "wa"));
-                            } else if (val.Surface) {
-                                if (val.Surface[0] == " ") return;
-                                output.push(val.Surface[0]);
+                        if (res.ResultSet) {
+                            try {
+                                _.forEach(res.ResultSet.Result[0].WordList[0].Word, (val) => {
+                                    if (val.Roman) {
+                                        if (val.Roman[0] == " ") return;
+                                        output.push(val.Roman[0].replace(/ha/g, "wa"));
+                                    } else if (val.Surface) {
+                                        if (val.Surface[0] == " ") return;
+                                        output.push(val.Surface[0]);
+                                    } else return;
+                                });
+                            } catch(e) {
+                                channel.send(core.error("translate", e));
                             }
-                        });
+                        } else resolve(["¯\\_(ツ)_/¯"]);
 
                         resolve(output);
                     }
@@ -122,7 +128,7 @@ exports.main = (slack, channel, user, args, ts, config) => {
         var format = [`*${from_fancy}:* ${query}`, `*${to_fancy}:* ${translation.firstUpper()}`];
 
         if (to_lang == "ja" || from_lang == "ja") {
-            romaji(to_roma).then((furigana) => {
+            romaji(to_roma, channel).then((furigana) => {
                 var format_roma = `*Romaji:* ${hepburn.cleanRomaji(furigana.join(" ")).toLowerCase().replace(/thi/g, "ti")}`;
 
                 if (from_lang === "ja") format.splice(1, 0, format_roma);
